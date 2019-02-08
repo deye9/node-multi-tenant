@@ -6,7 +6,7 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
         autoIncrement: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.BIGINT
       },
       fqdn: {
         unique: true,
@@ -17,13 +17,15 @@ module.exports = {
         type: Sequelize.STRING
       },      
       force_https: {
+        allowNull: false,
+        defaultValue: false,
         type: Sequelize.BOOLEAN
       },      
       under_maintenance_since: {
         type: Sequelize.DATE
       },
       website_id: {
-        type: Sequelize.INTEGER
+        type: Sequelize.BIGINT
       },
       createdAt: {
         allowNull: false,
