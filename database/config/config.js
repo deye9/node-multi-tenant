@@ -1,26 +1,28 @@
+const fs = require('fs');
+
 module.exports = {
     "development": {
-      "username": "gbenga",
-      "password": "spyder_gbenga",
-      "database": "esb_development",
-      "host": "localhost",
-      "dialect": "postgres",
-      "port": 5432
+        "username": process.env.DEV_DB_USERNAME,
+        "password": process.env.DEV_DB_PASSWORD,
+        "database": process.env.DEV_DB_NAME,
+        "host": process.env.DEV_DB_HOSTNAME,
+        "dialect": "postgres",
+        "port": process.env.DEV_DB_PORT
     },
     "testing": {
-      "username": "gbenga",
-      "password": "spyder_gbenga",
-      "database": "esb_test",
-      "host": "localhost",
-      "dialect": "postgres",
-      "port": 5432
+        "username": process.env.TEST_DB_USERNAME,
+        "password": process.env.TEST_DB_PASSWORD,
+        "database": process.env.TEST_DB_NAME,
+        "host": process.env.TEST_DB_HOSTNAME,
+        "dialect": "postgres",
+        "port": process.env.TEST_DB_PORT
     },
     "production": {
-      "username": "gbenga",
-      "password": "spyder_gbenga",
-      "database": "esb",
-      "host": "localhost",
-      "dialect": "postgres",
-      "port": 5432
+        "username": process.env.PROD_DB_USERNAME,
+        "password": process.env.PROD_DB_PASSWORD,
+        "database": process.env.PROD_DB_NAME,
+        "host": process.env.PROD_DB_HOSTNAME,
+        "dialect": "postgres",
+        "port": process.env.PROD_DB_PORT
     }
-  }
+}
