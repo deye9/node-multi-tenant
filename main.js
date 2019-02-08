@@ -4,17 +4,13 @@
  */
 
 // Dependencies
-const cli = require('./lib/cli'),
-  server = require('./lib/server');
+const cli = require('./lib/cli');
 
   // Declare the app
 let app = {};
 
 // Init function
-app.init = async (callback) => {
-    // If we're not on the master thread, start the HTTP server
-    server.init();
-    
+app.init = async (callback) => {    
     // Start the CLI
     cli.init();
 };
