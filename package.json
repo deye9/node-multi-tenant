@@ -1,0 +1,45 @@
+{
+  "name": "node-multi-tenant",
+  "version": "1.0.3",
+  "description": "Multi-tenant Node.js Application",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "test-watch": "npm test -- --watch",
+    "eslint": "eslint **/*.js --fix --quiet",
+    "coverage": "npm test && open coverage/index.html",
+    "test-integration": "nyc --reporter=html --reporter=text mocha ./tests/Integration --exit && open coverage/index.html",
+    "test": "npm run eslint && nyc --reporter=html --reporter=text mocha tests --recursive --exit && open coverage/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deye9/node-multi-tenant.git"
+  },
+  "keywords": [
+    "Multi Tenant",
+    "Multi Tenancy"
+  ],
+  "author": "Adegbenga A. Adeye",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/deye9/node-multi-tenant/issues"
+  },
+  "homepage": "https://github.com/deye9/node-multi-tenant#readme",
+  "dependencies": {
+    "auto-bind": "^2.0.0",
+    "pg": "^7.8.1",
+    "sequelize": "^4.42.0",
+    "sequelize-cli": "^5.4.0"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "chai-http": "^4.2.1",
+    "eslint": "^5.12.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.16.0",
+    "mocha": "^5.2.0",
+    "nyc": "^13.1.0",
+    "sinon": "^7.2.3"
+  }
+}
