@@ -4,20 +4,23 @@
  */
 
 // Dependencies
-const cli = require('./lib/cli'),
-  handlers = require('./lib/handlers');
+const {init: cliInit} = require('./lib/cli'),
+  {createTenant: createTenant} = require('./lib/handlers');
 
 // Declare the app
 let app = {};
 
-// Init function
+/**
+ * Init function
+ *
+ */
 app.init = () => {
   // Start the CLI
-  cli.init();
+  cliInit();
 };
 
 // Export the app
 module.exports = {
   init: () => app.init(),
-  createTenant: () => handlers.createTenant()
+  createTenant: () => createTenant()
 };
