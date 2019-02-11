@@ -4,7 +4,8 @@
  *
  */
 
-// use Hyn\Tenancy\Database\Connection;
+// Dependencies
+require('dotenv').config();
 
 return {
     'datastore': {
