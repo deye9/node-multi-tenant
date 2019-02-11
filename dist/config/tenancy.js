@@ -7,21 +7,15 @@
 // Dependencies
 require('dotenv').config();
 
-return {
+module.exports = {
+    /**
+     * Contains all the paths to your datastores.
+     */
     'datastore': {
-
-        /**
-         * Specify different models to be used for the global, system database
-         * connection. These are also used in their relationships. Models
-         * used have to implement their respective contracts and
-         * either extend the SystemModel or use the trait
-         * UsesSystemConnection.
-         */
-        
-         dbconfigfile: '',
-         modelsfolder: '',
-         seedersfolder: '',
-         migrationsfolder: ''
+         modelsfolder: 'path to the folder containing your models',
+         seedersfolder: 'path to the folder containing your seeders',
+         migrationsfolder: 'path to the folder containing your migrations',
+         dbconfigfile: 'path to the db config file containing all your connection string details'
     },
     /**
      * The package middleware. Removing a middleware here will disable it.
@@ -60,7 +54,7 @@ return {
          *
          * This should be enabled for MySQL, but not for MariaDB and PostgreSQL.
          */
-        'uuid-limit-length-to-32': env('LIMIT_UUID_LENGTH_32', false),
+        // 'uuid-limit-length-to-32': env('LIMIT_UUID_LENGTH_32', false),
 
         /**
          * Specify the disk you configured in the filesystems.php file where to store
@@ -98,7 +92,7 @@ return {
          * @see
          * @info set to true to enable.
          */
-        'auto-delete-tenant-directory': env('AUTO_DELETE_TENANT_DIRECTORY', false),
+        // 'auto-delete-tenant-directory': env('AUTO_DELETE_TENANT_DIRECTORY', false),
 
         /**
          * Time to cache websites in minutes. Set to false to disable.
@@ -113,7 +107,7 @@ return {
          *
          * @warn this must be a FQDN, these have no protocol or path!
          */
-        'default': env('TENANCY_DEFAULT_HOSTNAME'),
+        // 'default': env('TENANCY_DEFAULT_HOSTNAME'),
         /**
          * The package is able to identify the requested hostname by itself,
          * disable to get full control (and responsibility) over hostname
@@ -122,7 +116,7 @@ return {
          *
          * @see src/Jobs/HostnameIdentification.php
          */
-        'auto-identification': env('TENANCY_AUTO_HOSTNAME_IDENTIFICATION', true),
+        // 'auto-identification': env('TENANCY_AUTO_HOSTNAME_IDENTIFICATION', true),
 
         /**
          * In case you want to have the tenancy environment set up early,
@@ -132,13 +126,13 @@ return {
          * A good use case is when you have set "tenant" as the default
          * database connection.
          */
-        'early-identification': env('TENANCY_EARLY_IDENTIFICATION', true),
+        // 'early-identification': env('TENANCY_EARLY_IDENTIFICATION', true),
 
         /**
          * Abort application execution in case no hostname was identified. This will throw a
          * 404 not found in case the tenant hostname was not resolved.
          */
-        'abort-without-identified-hostname': env('TENANCY_ABORT_WITHOUT_HOSTNAME', false),
+        // 'abort-without-identified-hostname': env('TENANCY_ABORT_WITHOUT_HOSTNAME', false),
 
         /**
          * Time to cache hostnames in minutes. Set to false to disable.
@@ -161,7 +155,7 @@ return {
          * You can set a environment variable to override the default database
          * connection to - for instance - the tenant connection 'tenant'.
          */
-        'default': env('TENANCY_DEFAULT_CONNECTION'),
+        // 'default': env('TENANCY_DEFAULT_CONNECTION'),
         /**
          * Used to give names to the system and tenant database connections. By
          * default we configure 'system' and 'tenant'. The tenant connection
@@ -185,7 +179,7 @@ return {
          *
          * @see src/Database/Connection.php
          */
-        'tenant-division-mode': env('TENANCY_DATABASE_DIVISION_MODE', 'database'),
+        // 'tenant-division-mode': env('TENANCY_DATABASE_DIVISION_MODE', 'database'),
 
         /**
          * The database password generator takes care of creating a valid hashed
@@ -205,7 +199,7 @@ return {
          * @warn this has to be an absolute path, feel free to use helper methods like
          * base_path() or database_path() to set this up.
          */
-        'tenant-migrations-path': database_path('migrations/tenant'),
+        // 'tenant-migrations-path': database_path('migrations/tenant'),
 
         /**
          * The default Seeder class used on newly created databases and while
@@ -254,7 +248,7 @@ return {
          *
          * @info set to true to enable.
          */
-        'auto-delete-tenant-database': env('TENANCY_DATABASE_AUTO_DELETE', false),
+        // 'auto-delete-tenant-database': env('TENANCY_DATABASE_AUTO_DELETE', false),
 
         /**
          * Automatically delete the user needed to access the tenant database.
@@ -262,7 +256,7 @@ return {
          * @info Set to false to disable.
          * @info Only deletes in case tenant database is set to be deleted.
          */
-        'auto-delete-tenant-database-user': env('TENANCY_DATABASE_AUTO_DELETE_USER', false),
+        // 'auto-delete-tenant-database-user': env('TENANCY_DATABASE_AUTO_DELETE_USER', false),
 
         /**
          * Define a list of classes that you wish to force onto the tenant or system connection.
@@ -292,7 +286,7 @@ return {
          *
          * @info Set to false or null to disable.
          */
-        'path': base_path('routes/tenants.php'),
+        // 'path': base_path('routes/tenants.php'),
 
         /**
          * Set to true to flush all global routes before setting the routes from the
@@ -318,7 +312,7 @@ return {
              * List of configuration files to ignore, preventing override of crucial
              * application configurations.
              */
-            'blacklist': {'database', 'tenancy', 'webserver'},
+            // 'blacklist': {'database', 'tenancy', 'webserver'},
         },
         'routes': {
             /**
