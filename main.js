@@ -22,5 +22,5 @@ app.init = () => {
 // Export the app
 module.exports = {
   init: () => app.init(),
-  createTenant: () => createTenant()
+  createTenant: (fqdn, email, password) => createTenant(fqdn, email, password)
 };

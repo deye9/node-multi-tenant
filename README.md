@@ -5,7 +5,7 @@
 
 This application relies heavily on sequelizejs for its database connections. Dialects supported as of now are MySQL, SQLite, PostgreSQL and MSSQL. You can read up here http://docs.sequelizejs.com/manual/installation/usage.html#dialects
 
-After installation a postinstall event is fired which executes the postinstall.sh file. The postinstall.sh file basically creates a tenants folder in the Migrations folder after which it moves all existing migration files to the tenants folder.
+After installation a postinstall event is fired which executes the postinstall.sh file. The postinstall.sh file basically creates a tenants folder and copies over a tenancy.js file there for easy configuration of the app.
 
 Drop all migrations for the tenants in the tenants folder.
 
