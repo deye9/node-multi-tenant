@@ -17,8 +17,10 @@ let app = {};
  */
 app.init = () => {
   // Start the CLI
-  console.log('1 = ' , path);
-  console.log('2 = ' , __dirname);
+  console.log('1 = ', __dirname);
+  console.log('2 = ', path.dirname(__dirname));
+  console.log('3 = ', process.env.TENANT_PATH);
+  // /Users/andelatsm/Desktop/Projects/NodeApps/ESB/node_modules/node_multi_tenant
   
   //   let tenantPath = path(__dirname);
 
