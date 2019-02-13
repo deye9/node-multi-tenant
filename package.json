@@ -27,6 +27,7 @@
   },
   "homepage": "https://github.com/deye9/node_multi_tenant#readme",
   "dependencies": {
-    "auto-bind": "^2.0.0"
+    "auto-bind": "^2.0.0",
+    "uuid": "^3.3.2"
   }
 }
