@@ -17,6 +17,10 @@ module.exports = {
          migrationsfolder: 'path to the folder containing your migrations',
          dbconfigfile: 'path to the db config file containing all your connection string details'
     },
+    'models': {
+        "tenancy_websites": 'tenancy_websites.js',
+        "tenancy_hostname": 'tenancy_hostname.js',
+    },
     /**
      * The package middleware. Removing a middleware here will disable it.
      * You can of course extend/replace them or add your own.

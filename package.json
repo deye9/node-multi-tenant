@@ -25,5 +25,8 @@
   "bugs": {
     "url": "https://github.com/deye9/node_multi_tenant/issues"
   },
-  "homepage": "https://github.com/deye9/node_multi_tenant#readme"
+  "homepage": "https://github.com/deye9/node_multi_tenant#readme",
+  "dependencies": {
+    "auto-bind": "^2.0.0"
+  }
 }
