@@ -6,7 +6,7 @@
 // Dependencies
 const path = require('path'),
   {init: cliInit} = require('./lib/cli'),
-  {createTenant: createTenant, tenantExists: tenantExists} = require('./lib/handlers');
+  {createTenant: createTenant, tenantExists: tenantExists, deleteTenant: deleteTenant} = require('./lib/handlers');
 
 // Declare the app
 let app = {};
@@ -25,4 +25,5 @@ module.exports = {
   init: () => app.init(),
   createTenant: (fqdn) => createTenant(fqdn),
   tenantExists: (fqdn) => tenantExists(fqdn),
+  deleteTenant: (fqdn) => deleteTenant(fqdn),
 };
