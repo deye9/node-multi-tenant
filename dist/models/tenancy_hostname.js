@@ -5,7 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     redirect_to: DataTypes.STRING,
     force_https: DataTypes.BOOLEAN,
     under_maintenance_since: DataTypes.DATE,
-    website_id: DataTypes.INTEGER,
+    uuid: DataTypes.UUID,
   }, {});
   hostname.associate = function(models) {
     // associations can be defined here

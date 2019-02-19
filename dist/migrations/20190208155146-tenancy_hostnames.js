@@ -24,8 +24,9 @@ module.exports = {
       under_maintenance_since: {
         type: Sequelize.DATE
       },
-      website_id: {
-        type: Sequelize.BIGINT
+      uuid: {
+        allowNull: false,
+        type: Sequelize.STRING(191)
       },
       createdAt: {
         allowNull: false,
