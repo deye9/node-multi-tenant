@@ -22,6 +22,7 @@ module.exports = {
         type: Sequelize.BOOLEAN
       },      
       under_maintenance_since: {
+        allowNull: true,
         type: Sequelize.DATE
       },
       uuid: {
