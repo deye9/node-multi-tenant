@@ -4,10 +4,8 @@
  */
 
 // Dependencies
-const path = require('path'),
-  {init: cliInit} = require('./lib/cli'),
-  {createTenant: createTenant, tenantExists: tenantExists, 
-    deleteTenant: deleteTenant, updateTenant: updateTenant} = require('./lib/handlers');
+const handlers = require('./lib/handlers'),
+  {init: cliInit} = require('./lib/cli');
 
 // Declare the app
 let app = {};
@@ -24,8 +22,9 @@ app.init = () => {
 // Export the app
 module.exports = {
   init: () => app.init(),
-  createTenant: (fqdn) => createTenant(fqdn),
-  tenantExists: (fqdn) => tenantExists(fqdn),
-  deleteTenant: (fqdn) => deleteTenant(fqdn),
-  updateTenant: (fqdn, dataObject) => updateTenant(fqdn, dataObject)
+  createTenant: (fqdn) => handlers.createTenant(fqdn),
+  tenantExists: (fqdn) => handlers.tenantExists(fqdn),
+  deleteTenant: (fqdn) => handlers.deleteTenant(fqdn),
+  updateTenant: (fqdn, dataObject) => handlers.updateTenant(fqdn, dataObject),
+  getTenantConnectionString: (fqdn) => handlers.getTenantConnectionString(fqdn)
 };

@@ -62,3 +62,4 @@ typings/
 
 # ignore commands file
 commands.txt
+*.php
