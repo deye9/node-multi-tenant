@@ -8,10 +8,9 @@ This application relies heavily on sequelizejs for its database connections. Dia
 After installation a postinstall event is fired which executes the postinstall.sh file. The postinstall.sh file basically creates a tenants folder and copies over a tenancy.js file there for easy configuration of the app. Access to dotenv is also needed.
 
 Drop all migrations for the tenants in the tenants folder.
-1.
-2.
-3.
-4. Create a global emitter event in your route file and emit the req.headers.host there
+
+1. A global emitter event is created, kindly emit the req.headers.host to it.
+2. Please call the tenantsInit() on your app init as it modifies your connection to create an array of connections. Your main connection can be accessed via db['default']. Child connections will have the uuid passed to the db array for them to be available.
 
 
 http://docs.sequelizejs.com/manual/tutorial/migrations.html
