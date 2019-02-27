@@ -30,17 +30,15 @@ app.init = async () => {
   // Start the CLI
   cliInit();
 
-  em.emit('requestUrl', 'Default');
-
-  // Get a reference to the TenantRepository and reset the DB.
+  // Get a reference to the TenantRepository 
   const tenant = await new TenantRepository();
-  // db = await tenant.currentDB();
 
-  // await tenant.init();
-  // await handlers.createTenant('andela1.localhost:3000');
+  // Bind the connection event with the listner1 function
+  em.on('requestUrl', tenant.currentDB);
 
-  // const result = await tenant.findById(1);
-  // console.log(result);
+  // Fire the requestUrl event.
+  em.emit('requestUrl', process.env.TENANCY_DEFAULT_HOSTNAME.toLowerCase());
+
 };
 
 // Export the app
