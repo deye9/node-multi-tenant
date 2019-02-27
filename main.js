@@ -30,24 +30,23 @@ app.init = async () => {
   // Start the CLI
   cliInit();
 
+  em.emit('requestUrl', 'Default');
+
   // Get a reference to the TenantRepository and reset the DB.
   const tenant = await new TenantRepository();
-  db = await tenant.currentDB();
+  // db = await tenant.currentDB();
 
   // await tenant.init();
   // await handlers.createTenant('andela1.localhost:3000');
-  // 
 
   // const result = await tenant.findById(1);
   // console.log(result);
-  em.emit('requestUrl', 'Default');
-
-  
 };
 
 // Export the app
 module.exports = {
   init: () => app.init(),
+  currentDB: () => tenant.currentDB(),
   createTenant: (fqdn) => handlers.createTenant(fqdn),
   tenantExists: (fqdn) => handlers.tenantExists(fqdn),
   deleteTenant: (fqdn) => handlers.deleteTenant(fqdn),
