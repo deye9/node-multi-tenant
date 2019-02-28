@@ -48,6 +48,9 @@ module.exports = {
   createTenant: (fqdn) => handlers.createTenant(fqdn),
   tenantExists: (fqdn) => handlers.tenantExists(fqdn),
   deleteTenant: (fqdn) => handlers.deleteTenant(fqdn),
+  delete: (modelName, key) => handlers.delete(modelName, key),
   getTenantConnectionString: () => handlers.getTenantConnectionString(),
+  create: (modelName, dataObject) => handlers.create(modelName, dataObject),
   updateTenant: (fqdn, dataObject) => handlers.updateTenant(fqdn, dataObject),
+  update: (modelName, key, dataObject) => handlers.update(modelName, key, dataObject),
 };
