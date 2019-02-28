@@ -48,6 +48,6 @@ module.exports = {
   createTenant: (fqdn) => handlers.createTenant(fqdn),
   tenantExists: (fqdn) => handlers.tenantExists(fqdn),
   deleteTenant: (fqdn) => handlers.deleteTenant(fqdn),
+  getTenantConnectionString: () => handlers.getTenantConnectionString(),
   updateTenant: (fqdn, dataObject) => handlers.updateTenant(fqdn, dataObject),
-  getTenantConnectionString: (fqdn) => handlers.getTenantConnectionString(fqdn)
 };
