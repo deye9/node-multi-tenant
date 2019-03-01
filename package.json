@@ -1,5 +1,5 @@
 {
-  "name": "node_multi_tenant",
+  "name": "node-multi-tenant",
   "version": "1.0.0",
   "description": "Multi-tenant Node.js Application",
   "main": "main.js",
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/deye9/node_multi_tenant.git"
+    "url": "git+https://github.com/deye9/node-multi-tenant.git"
   },
   "keywords": [
     "Multi Tenant",
@@ -22,9 +22,9 @@
   "author": "Adegbenga A. Adeye",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/deye9/node_multi_tenant/issues"
+    "url": "https://github.com/deye9/node-multi-tenant/issues"
   },
-  "homepage": "https://github.com/deye9/node_multi_tenant#readme",
+  "homepage": "https://github.com/deye9/node-multi-tenant#readme",
   "dependencies": {
     "auto-bind": "^2.0.0",
     "pg": "^7.8.1",
