@@ -12,9 +12,11 @@ Also will like to appreciate https://github.com/blugavere/node-repositories for 
 
 That being said let's get down to Node.js business.
 
+```
 Welcome to the unobtrusive Node.js package that makes your app multi tenant. Serving multiple websites, each with one or more hostnames from the same codebase. But with clear separation of databases.
 
 Suitable for all developers / companies or start-ups building the next software as a service and are interested in re-using functionality for different clients.
+```
 
 ## Requirements, recommended environment
 
