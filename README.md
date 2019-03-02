@@ -22,7 +22,7 @@ Suitable for all developers / companies or start-ups building the next software
 as a service and are interested in re-using functionality for different clients.
 ```
 
-## Requirements, recommended environment
+## Dependencies
 
 This application relies heavily on sequelizejs for its database connections. Dialects supported as of now are MySQL, SQLite, PostgreSQL and MSSQL.
 You can read up here http://docs.sequelizejs.com/manual/installation/usage.html#dialects. Also the following packages are required dependencies
@@ -92,7 +92,7 @@ Available Methods:
 
 ## create
 
- Creates a record in the tenant using the model name supplied.
+Creates a record in the tenant using the model name supplied.
 
 **Parameters**
 
@@ -119,13 +119,61 @@ Promise of type Model
 
 ## createTenant
 
+ Creates a tenant.
+
+**Parameters**
+
+- fqdn of type String [Fully Qualified Domain Name]
+
+**Sample Code**
+
+ const result = await newTenant('sample.dev');
+
+**Return Type:**
+
+Promise of type Model
+{
+    'website_id': id,
+    'uuid': uuid,
+    'fqdn': fqdn
+};
+
 **[⬆ back to top](#Overview)**
 
 ## delete
 
+Remove the record from the tenant using the model name and key supplied
+
+**Parameters**
+
+- modelName of type String [Contains the name of the model to be used]
+- dataObject of type Object [Key value representation of the data to be deleted]
+
+**Sample Code**
+
+ const result = await _delete('Users', {id:2});
+
+**Return Type:**
+
+Promise of Object [Returns back the key passed in]
+
 **[⬆ back to top](#Overview)**
 
 ## deleteTenant
+
+Deletes a tenant's records from the DB alongside the created DB.
+
+**Parameters**
+
+- fqdn of type String [Fully Qualified Domain Name]
+
+**Sample Code**
+
+ const result = await removeTenant('sample.dev');
+
+**Return Type:**
+
+Promise of type String [UUID of database]
 
 **[⬆ back to top](#Overview)**
 
