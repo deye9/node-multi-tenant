@@ -6,7 +6,11 @@
 
 ## Introduction
 
-A big shout out to the folks at https://laravel-tenancy.com/ who served as an inspiration for this project. This is a Node.js version of their PHP code. Please note that this project is not in any way up to what they offer on PHP but it can only get better with nodejs. That being said let's get down to Node.js business.
+A big shout out to the folks at https://laravel-tenancy.com/ who served as an inspiration for this project. This is a Node.js version of their PHP code. Please note that this project is not in any way up to what they offer on PHP but it can only get better with nodejs. 
+
+Also will like to appreciate https://github.com/blugavere/node-repositories for being a source of inspiration for the repository used by the package.
+
+That being said let's get down to Node.js business.
 
 Welcome to the unobtrusive Node.js package that makes your app multi tenant. Serving multiple websites, each with one or more hostnames from the same codebase. But with clear separation of databases.
 
