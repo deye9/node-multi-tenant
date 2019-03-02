@@ -11,7 +11,5 @@ module.exports = (sequelize, DataTypes) => {
     // associations can be defined here
   };
   
-  //hostname.BelongsTo(website, {as: 'hostnames_website_id_foreign', through: 'website_id', foreignKey: 'id' });
-
   return hostname;
 };

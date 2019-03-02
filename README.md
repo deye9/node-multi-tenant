@@ -3,6 +3,29 @@
 <img src="https://cdn-images-1.medium.com/max/1600/1*YJHmalZ71_3AekY06edhPg.png" alt="Multi-tenant Node.js Application">
 (c) https://blog.lftechnology.com/designing-a-secure-and-scalable-multi-tenant-application-on-node-js-15ae13dda778
 
+```sh
+$ npm install --save https://github.com/deye9/node-multi-tenant
+```
+
+## Overview
+Available Methods:
+- [init](./packages/redis-repository/README.md)
+- [currentDB](./packages/inmem-repository/README.md)
+- [findAll](#ajax)
+- [createTenant](#postgresql)
+- [tenantExists](#cassandra)
+- [Filesystem](#filesystem-repository)
+- [deleteTenant](#mongoose-repository)
+- [delete](#mongodb-native-repository)
+- [findById](#mongodb-native-repository)
+- [findFirst](#mongodb-native-repository)
+- [getTenantConnectionString](#mongodb-native-repository)
+- [create](#mongodb-native-repository)
+- [updateTenant](#mongodb-native-repository)
+- [update](#mongodb-native-repository)
+
+
+
 This application relies heavily on sequelizejs for its database connections. Dialects supported as of now are MySQL, SQLite, PostgreSQL and MSSQL. You can read up here http://docs.sequelizejs.com/manual/installation/usage.html#dialects
 
 After installation a postinstall event is fired which executes the postinstall.sh file. The postinstall.sh file basically creates a tenants folder and copies over a tenancy.js file there for easy configuration of the app. Access to dotenv is also needed.

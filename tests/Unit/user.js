@@ -1,12 +1,9 @@
 'use strict';
 
-const chai = require('chai'),
-    db = require('../../../database/models'),
-    PostgreRepository = require('../../../database/repositories/repository')
-
+const chai = require('chai');
 chai.should();
 
-describe("User Model", () => {
+describe.skip("User Model", () => {
 
     let user = {};
     let sequelizeRepo = null;

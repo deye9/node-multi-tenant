@@ -2,9 +2,7 @@
 
 const chai = require('chai'),
     chaiHttp = require('chai-http'),
-    server = require('../../lib/server'),
-    aspromised = require('chai-as-promised'),
-    HttpStatus = require('http-status-codes');
+    aspromised = require('chai-as-promised');
 
 chai.should();
 chai.use(chaiHttp);
@@ -12,7 +10,7 @@ chai.use(chaiHttp);
 /*
  * Test the /POST route
  */
-describe('/POST api/users', () => {
+describe.skip('/POST api/users', () => {
     let user = {};
 
     beforeEach((done) => {
