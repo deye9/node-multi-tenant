@@ -47,8 +47,73 @@ $ npm install --save https://github.com/deye9/node-multi-tenant
 
 Drop all migrations for the tenants in the tenants folder.
 
-1. A global emitter event is created, kindly emit the req.headers.host to it.
-2. Please call the tenantsInit() on your app init as it modifies your connection to create an array of connections. Your main connection can be accessed via db['default']. Child connections will have the uuid passed to the db array for them to be available.
+1. A global emitter event is created, kindly emit the req.headers.host to it. It is highly recommended this be done in your routers file / module. Below is a sample code
+```
+/*
+ * Routes file
+ *
+ */
+
+// Dependencies
+const handlers = require('./lib/handlers');
+
+const requestRouter = {
+    /**
+     * handles all route request.
+     *
+     * @param {String} trimmedPath [Fully Qualified Domain Name]
+     * @param {String} requestUrl [req.headers.host]
+     * @returns {String}
+     */
+    handleRequest(trimmedPath, requestUrl) {
+
+        requestRouter.eventManager(requestUrl);
+
+        switch (trimmedPath) {
+            case '':
+                return handlers.index;
+
+            case 'favicon.ico':
+                return handlers.favicon;
+
+            case 'account/create':
+                return handlers.accountCreate;
+
+            case 'session/create':
+                return handlers.sessionCreate;
+
+            case 'ping':
+                return handlers.ping;
+
+            case 'api/menu':
+                return handlers.menus;
+
+            case 'public':
+                return handlers.public;
+
+            default:
+                break;
+        }
+    },
+
+    /**
+     * emit the req.headers.host as an event to be consumed.
+     *
+     * @param {String} requestUrl
+     */
+    eventManager(requestUrl) {
+        em.emit('requestUrl', requestUrl);
+    }
+};
+
+// Export the routes
+module.exports = {
+    handleRequest: (trimmedPath, requestUrl) => requestRouter.handleRequest(trimmedPath, requestUrl)
+};
+```
+
+2. Please call the tenantsInit() on your app init as it modifies your connection to create an array of connections. 
+Your main connection can be accessed via db['default']. Child connections will have the uuid passed to the db array for them to be available.
 
 ## Overview
 
@@ -74,6 +139,7 @@ To use any of the methods, kindly find a sample of what your import statement wi
 
 Available Methods:
 
+- [cli methods](#cli)
 - [create](#create)
 - [currentDB](#currentDB)
 - [createTenant](#createTenant)
@@ -87,6 +153,74 @@ Available Methods:
 - [tenantExists](#tenantExists)
 - [update](#update)
 - [updateTenant](#updateTenant)
+
+**[⬆ back to top](#Overview)**
+
+## cli
+
+**Available Commands**
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                                                                                     CLI MANUAL
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+       exit                                        Kill the CLI (and the rest of the application)
+
+       man                                         Show this help page
+
+       help                                        Alias of the "man" command
+
+       tenancy:init                                Installs the tenancy configurations file.
+
+       tenancy:install                             Install the tenancy files based on configurations in the tenants/tenancy.js file
+
+       tenancy:db:seed                             Seed the database with records
+
+       tenancy:recreate                            Command to recreate all tenant databases that do not exist
+
+       tenancy:db:unseed --{Action}                Undo all seeds [Action = recent, all]
+
+       tenancy:migrate:refresh                     Reset and re-run all migrations
+
+       tenancy:migrate:rollback                    Rollback the last database migration
+
+       tenancy:migrate --{tenantID}                Run the database migrations on all or specific tenants. {IDs of tenants to migrate. e.g --tenantID=1 --tenantID=2}
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+After the package has been installed. Run the **tenancy:init** command to setup the need files. Once the command has finished executing, you will notice a tenants folder in your root directory.
+Inside that directory is a file called tenancy.js. Kind configure with the required path to the folders specified also remember to put in the name of the models you want to be shared. 
+This models on the default database. Below is an example of a valid tenancy.js file
+
+```
+/*
+ *
+ * Configuaration file for the Node Multi Tenant Application.
+ *
+ */
+
+// Dependencies
+require('dotenv').config();
+
+module.exports = {
+    /**
+     * Contains all the paths to your datastores.
+     */
+    'datastore': {
+        modelsfolder: 'database/models',
+        seedersfolder: 'database/seeders',
+        migrationsfolder: 'database/migrations',
+        dbconfigfile: 'database/models/index'
+    },
+    'models-shared': {
+        'tenancy_hostname': 'hostname.js',
+    }
+};
+```
+
+Once you are done configuring your tenancy.js file, you now run **tenancy:install** to install and setup tenancy fully in your application and you are officially good to go.
 
 **[⬆ back to top](#Overview)**
 
