@@ -6,7 +6,7 @@
 
 ## Introduction
 
-A big shout out to the folks at https://laravel-tenancy.com/ who served as an inspiration for this project. This is a Node.js version of their PHP code. Please note that this project is not in any way up to what they offer on PHP but it can only get better with nodejs. 
+A big shout out to the folks at https://laravel-tenancy.com/ who served as an inspiration for this project. This is a Node.js version of their PHP code. Please note that this project is not in any way up to what they offer on PHP but it can only get better with nodejs.
 
 Also will like to appreciate https://github.com/blugavere/node-repositories for being a source of inspiration for the repository used by the package.
 
@@ -52,6 +52,26 @@ Drop all migrations for the tenants in the tenants folder.
 
 ## Overview
 
+To use any of the methods, kindly find a sample of what your import statement will look like:
+
+```
+  {
+    create: create,
+    update: update,
+    delete: _delete,
+    findAll: findAll,
+    init: tenantsInit,
+    findById: findById,
+    currentDB: currentDB,
+    findFirst: findFirst,
+    createTenant: newTenant,
+    tenantExists: validTenant,
+    deleteTenant: removeTenant,
+    updateTenant: updateTenant,
+    getTenantConnectionString: getTenantConnectionString
+  } = require('node-multi-tenant');
+```
+
 Available Methods:
 
 - [create](#create)
@@ -67,6 +87,73 @@ Available Methods:
 - [tenantExists](#tenantExists)
 - [update](#update)
 - [updateTenant](#updateTenant)
+
+**[⬆ back to top](#Overview)**
+
+## create
+ Creates a record in the tenant using the model name supplied.
+
+**Parameters**
+ modelName of type String
+ dataObject of type Object
+
+**Sample Code**
+ const result = await create('Users', {
+   firstName: 'Oluwakemi',
+   lastName: 'Adeye',
+   email: 'jenina_4u@yahoo.com'
+ }));
+
+**Return Type:**
+Promise<Model>
+
+**[⬆ back to top](#Overview)**
+
+## currentDB
+
+**[⬆ back to top](#Overview)**
+
+## createTenant
+
+**[⬆ back to top](#Overview)**
+
+## delete
+
+**[⬆ back to top](#Overview)**
+
+## deleteTenant
+
+**[⬆ back to top](#Overview)**
+
+## findAll
+
+**[⬆ back to top](#Overview)**
+
+## findById
+
+**[⬆ back to top](#Overview)**
+
+## findFirst
+
+**[⬆ back to top](#Overview)**
+
+## getTenantConnectionString
+
+**[⬆ back to top](#Overview)**
+
+## init
+
+**[⬆ back to top](#Overview)**
+
+## tenantExists
+
+**[⬆ back to top](#Overview)**
+
+## update
+
+**[⬆ back to top](#Overview)**
+
+## updateTenant
 
 **[⬆ back to top](#Overview)**
 
