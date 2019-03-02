@@ -226,7 +226,7 @@ Gets the first record from the tenant database matching the criteria given.
 **Parameters**
 
 - modelName of type String [Contains the name of the model to be used]
-- key of type Object [Key value representation of the data to be deleted]
+- key of type Object [Key value representation of the data to be searched]
 
 **Sample Code**
 
@@ -234,7 +234,7 @@ Gets the first record from the tenant database matching the criteria given.
 
 **Return Type:**
 
-Promise of type String [UUID of database]
+Promise of type String
 
 **[⬆ back to top](#Overview)**
 
@@ -264,7 +264,7 @@ Starts the multi_tenants CLI
 
 ## tenantExists
 
-checks if the tenant exists.
+Checks if the tenant exists.
 
 **Parameters**
 
@@ -323,5 +323,3 @@ Updates the tenant record to the new records passed in.
 Promise of type Model
 
 **[⬆ back to top](#Overview)**
-
-http://docs.sequelizejs.com/manual/tutorial/migrations.html
