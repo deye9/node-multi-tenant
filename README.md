@@ -91,13 +91,16 @@ Available Methods:
 **[⬆ back to top](#Overview)**
 
 ## create
+
  Creates a record in the tenant using the model name supplied.
 
 **Parameters**
- modelName of type String
- dataObject of type Object
+
+- modelName of type String
+- dataObject of type Object
 
 **Sample Code**
+
  const result = await create('Users', {
    firstName: 'Oluwakemi',
    lastName: 'Adeye',
@@ -105,6 +108,7 @@ Available Methods:
  }));
 
 **Return Type:**
+
 Promise<Model>
 
 **[⬆ back to top](#Overview)**
