@@ -109,7 +109,7 @@ Available Methods:
 
 **Return Type:**
 
-Promise<Model>
+Promise of type Model
 
 **[⬆ back to top](#Overview)**
 
