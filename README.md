@@ -147,7 +147,7 @@ Remove the record from the tenant using the model name and key supplied
 **Parameters**
 
 - modelName of type String [Contains the name of the model to be used]
-- dataObject of type Object [Key value representation of the data to be deleted]
+- key of type Object [Key value representation of the data to be deleted]
 
 **Sample Code**
 
@@ -179,33 +179,148 @@ Promise of type String [UUID of database]
 
 ## findAll
 
+Gets an array of the values from the tenant based on conditions specified.
+
+**Parameters**
+
+- modelName of type String [Contains the name of the model to be used]
+- key of type Object [Key value representation of the data to be searched]
+
+**Sample Code**
+
+const result = await findAll('Users'));
+
+or
+
+const result = await findAll('Users', {id: {[Op.gte]: 3}}));
+
+**Return Type:**
+
+Promise of type Array of Model
+
 **[⬆ back to top](#Overview)**
 
 ## findById
+
+Gets the record from the tenant database by the Primary Key given.
+
+**Parameters**
+
+- modelName of type String [Contains the name of the model to be used]
+- id of type Integer [id of the field which is an integer value]
+
+**Sample Code**
+
+const result = await findById('Users', 16);
+
+**Return Type:**
+
+Promise of type Model
 
 **[⬆ back to top](#Overview)**
 
 ## findFirst
 
+Gets the first record from the tenant database matching the criteria given.
+
+**Parameters**
+
+- modelName of type String [Contains the name of the model to be used]
+- key of type Object [Key value representation of the data to be deleted]
+
+**Sample Code**
+
+ const result = await findFirst('Users', {id: 10});
+
+**Return Type:**
+
+Promise of type String [UUID of database]
+
 **[⬆ back to top](#Overview)**
 
 ## getTenantConnectionString
+
+Returns the connection string of the current / active tenant.
+
+**Sample Code**
+
+ const result = await getTenantConnectionString();
+
+**Return Type:**
+
+Promise of type String
 
 **[⬆ back to top](#Overview)**
 
 ## init
 
+Starts the multi_tenants CLI
+
+**Sample Code**
+
+ const result = await tenantsInit();
+
 **[⬆ back to top](#Overview)**
 
 ## tenantExists
+
+checks if the tenant exists.
+
+**Parameters**
+
+- fqdn of type String [Fully Qualified Domain Name]
+
+**Sample Code**
+
+ const result = await validTenant('sample.dev');
+
+**Return Type:**
+
+Promise of type Model
 
 **[⬆ back to top](#Overview)**
 
 ## update
 
+Updates the record in the tenant using the model name and the key supplied.
+
+**Parameters**
+
+- modelName of type String [Contains the name of the model to be used]
+- key of type Object [Key value representation of the data to be updated]
+- dataObject of type Object [Key value representation of the data to be updated]
+
+**Sample Code**
+
+ const result = await update('Users', {id:4}, { firstName: 'new First Name', lastName: 'new Last Name', email: 'new Email Address' });
+
+**Return Type:**
+
+Promise of type Array of Objects [key, dataObject]
+
 **[⬆ back to top](#Overview)**
 
 ## updateTenant
+
+Updates the tenant record to the new records passed in.
+
+**Parameters**
+
+- fqdn of type String [Fully Qualified Domain Name]
+- dataObject of type Object [Key value representation of the tenant data to be updated]
+
+**Sample Code**
+
+ const result =   await updateTenant('sample.dev', {
+    fqdn: 'qw',
+    redirect_to: 'rtwewe',
+    force_https: true,
+    under_maintenance_since: null
+  });
+
+**Return Type:**
+
+Promise of type Model
 
 **[⬆ back to top](#Overview)**
 
