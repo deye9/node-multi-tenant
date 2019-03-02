@@ -23,8 +23,8 @@ as a service and are interested in re-using functionality for different clients.
 
 ## Requirements, recommended environment
 
-This application relies heavily on sequelizejs for its database connections. Dialects supported as of now are MySQL, SQLite, PostgreSQL and MSSQL. 
-You can read up here http://docs.sequelizejs.com/manual/installation/usage.html#dialects. Also the following packages are dependencies
+This application relies heavily on sequelizejs for its database connections. Dialects supported as of now are MySQL, SQLite, PostgreSQL and MSSQL.
+You can read up here http://docs.sequelizejs.com/manual/installation/usage.html#dialects. Also the following packages are required dependencies
 
 ```
   -  "auto-bind": "^2.0.0",
