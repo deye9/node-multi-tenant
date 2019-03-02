@@ -96,8 +96,8 @@ Available Methods:
 
 **Parameters**
 
-- modelName of type String
-- dataObject of type Object
+- modelName of type String [Contains the name of the model to be used]
+- dataObject of type Object [Key value representation of the data to be created]
 
 **Sample Code**
 
