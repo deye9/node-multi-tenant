@@ -1,30 +1,36 @@
 # Multi-tenant Node.js Application
 
 <img src="https://cdn-images-1.medium.com/max/1600/1*YJHmalZ71_3AekY06edhPg.png" alt="Multi-tenant Node.js Application">
+
 (c) https://blog.lftechnology.com/designing-a-secure-and-scalable-multi-tenant-application-on-node-js-15ae13dda778
+
+## Installation
 
 ```sh
 $ npm install --save https://github.com/deye9/node-multi-tenant
 ```
 
 ## Overview
+
 Available Methods:
-- [init](./packages/redis-repository/README.md)
+
+- [create](#mongodb-native-repository)
 - [currentDB](./packages/inmem-repository/README.md)
-- [findAll](#ajax)
 - [createTenant](#postgresql)
-- [tenantExists](#cassandra)
-- [Filesystem](#filesystem-repository)
-- [deleteTenant](#mongoose-repository)
 - [delete](#mongodb-native-repository)
+- [deleteTenant](#mongoose-repository)
+
+- [findAll](#ajax)
 - [findById](#mongodb-native-repository)
 - [findFirst](#mongodb-native-repository)
+- [Filesystem](#filesystem-repository)
+
 - [getTenantConnectionString](#mongodb-native-repository)
-- [create](#mongodb-native-repository)
-- [updateTenant](#mongodb-native-repository)
+- [init](./packages/redis-repository/README.md)
+
+- [tenantExists](#cassandra)
 - [update](#mongodb-native-repository)
-
-
+- [updateTenant](#mongodb-native-repository)
 
 This application relies heavily on sequelizejs for its database connections. Dialects supported as of now are MySQL, SQLite, PostgreSQL and MSSQL. You can read up here http://docs.sequelizejs.com/manual/installation/usage.html#dialects
 
