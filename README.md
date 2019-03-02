@@ -68,5 +68,6 @@ Available Methods:
 - [update](#update)
 - [updateTenant](#updateTenant)
 
+**[⬆ back to top](#Overview)**
 
 http://docs.sequelizejs.com/manual/tutorial/migrations.html
