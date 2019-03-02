@@ -22,7 +22,7 @@ Suitable for all developers / companies or start-ups building the next software
 as a service and are interested in re-using functionality for different clients.
 ```
 
-## Requirements, recommended environment
+## Dependencies
 
 This application relies heavily on sequelizejs for its database connections. Dialects supported as of now are MySQL, SQLite, PostgreSQL and MSSQL.
 You can read up here http://docs.sequelizejs.com/manual/installation/usage.html#dialects. Also the following packages are required dependencies
@@ -92,7 +92,7 @@ Available Methods:
 
 ## create
 
- Creates a record in the tenant using the model name supplied.
+Creates a record in the tenant using the model name supplied.
 
 **Parameters**
 
@@ -119,46 +119,207 @@ Promise of type Model
 
 ## createTenant
 
+ Creates a tenant.
+
+**Parameters**
+
+- fqdn of type String [Fully Qualified Domain Name]
+
+**Sample Code**
+
+ const result = await newTenant('sample.dev');
+
+**Return Type:**
+
+Promise of type Model
+{
+    'website_id': id,
+    'uuid': uuid,
+    'fqdn': fqdn
+};
+
 **[⬆ back to top](#Overview)**
 
 ## delete
+
+Remove the record from the tenant using the model name and key supplied
+
+**Parameters**
+
+- modelName of type String [Contains the name of the model to be used]
+- key of type Object [Key value representation of the data to be deleted]
+
+**Sample Code**
+
+ const result = await _delete('Users', {id:2});
+
+**Return Type:**
+
+Promise of Object [Returns back the key passed in]
 
 **[⬆ back to top](#Overview)**
 
 ## deleteTenant
 
+Deletes a tenant's records from the DB alongside the created DB.
+
+**Parameters**
+
+- fqdn of type String [Fully Qualified Domain Name]
+
+**Sample Code**
+
+ const result = await removeTenant('sample.dev');
+
+**Return Type:**
+
+Promise of type String [UUID of database]
+
 **[⬆ back to top](#Overview)**
 
 ## findAll
+
+Gets an array of the values from the tenant based on conditions specified.
+
+**Parameters**
+
+- modelName of type String [Contains the name of the model to be used]
+- key of type Object [Key value representation of the data to be searched]
+
+**Sample Code**
+
+const result = await findAll('Users'));
+
+or
+
+const result = await findAll('Users', {id: {[Op.gte]: 3}}));
+
+**Return Type:**
+
+Promise of type Array of Model
 
 **[⬆ back to top](#Overview)**
 
 ## findById
 
+Gets the record from the tenant database by the Primary Key given.
+
+**Parameters**
+
+- modelName of type String [Contains the name of the model to be used]
+- id of type Integer [id of the field which is an integer value]
+
+**Sample Code**
+
+const result = await findById('Users', 16);
+
+**Return Type:**
+
+Promise of type Model
+
 **[⬆ back to top](#Overview)**
 
 ## findFirst
+
+Gets the first record from the tenant database matching the criteria given.
+
+**Parameters**
+
+- modelName of type String [Contains the name of the model to be used]
+- key of type Object [Key value representation of the data to be searched]
+
+**Sample Code**
+
+ const result = await findFirst('Users', {id: 10});
+
+**Return Type:**
+
+Promise of type String
 
 **[⬆ back to top](#Overview)**
 
 ## getTenantConnectionString
 
+Returns the connection string of the current / active tenant.
+
+**Sample Code**
+
+ const result = await getTenantConnectionString();
+
+**Return Type:**
+
+Promise of type String
+
 **[⬆ back to top](#Overview)**
 
 ## init
+
+Starts the multi_tenants CLI
+
+**Sample Code**
+
+ const result = await tenantsInit();
 
 **[⬆ back to top](#Overview)**
 
 ## tenantExists
 
+Checks if the tenant exists.
+
+**Parameters**
+
+- fqdn of type String [Fully Qualified Domain Name]
+
+**Sample Code**
+
+ const result = await validTenant('sample.dev');
+
+**Return Type:**
+
+Promise of type Model
+
 **[⬆ back to top](#Overview)**
 
 ## update
+
+Updates the record in the tenant using the model name and the key supplied.
+
+**Parameters**
+
+- modelName of type String [Contains the name of the model to be used]
+- key of type Object [Key value representation of the data to be updated]
+- dataObject of type Object [Key value representation of the data to be updated]
+
+**Sample Code**
+
+ const result = await update('Users', {id:4}, { firstName: 'new First Name', lastName: 'new Last Name', email: 'new Email Address' });
+
+**Return Type:**
+
+Promise of type Array of Objects [key, dataObject]
 
 **[⬆ back to top](#Overview)**
 
 ## updateTenant
 
-**[⬆ back to top](#Overview)**
+Updates the tenant record to the new records passed in.
 
-http://docs.sequelizejs.com/manual/tutorial/migrations.html
+**Parameters**
+
+- fqdn of type String [Fully Qualified Domain Name]
+- dataObject of type Object [Key value representation of the tenant data to be updated]
+
+**Sample Code**
+
+ const result =   await updateTenant('sample.dev', {
+    fqdn: 'qw',
+    redirect_to: 'rtwewe',
+    force_https: true,
+    under_maintenance_since: null
+  });
+
+**Return Type:**
+
+Promise of type Model
+
+**[⬆ back to top](#Overview)**
