@@ -102,9 +102,9 @@ Available Methods:
 **Sample Code**
 
  const result = await create('Users', {
-   firstName: 'Oluwakemi',
-   lastName: 'Adeye',
-   email: 'jenina_4u@yahoo.com'
+   firstName: 'User first Name',
+   lastName: 'User Last Name',
+   email: 'User Email Address'
  }));
 
 **Return Type:**
