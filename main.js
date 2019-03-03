@@ -10,7 +10,7 @@ const handlers = require('./lib/handlers'),
   } = require('./lib/cli'),
   {
     TenantRepository
-  } = require('./lib/Repository');
+  } = require('./lib/repository');
 
 // get the reference of EventEmitter class of events module
 const events = require('events');

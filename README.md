@@ -6,26 +6,21 @@
 
 ## Introduction
 
-A big shout out to the folks at https://laravel-tenancy.com/ who served as an inspiration for this project. This is a Node.js version of their PHP code. Please note that this project is not in any way up to what they offer on PHP but it can only get better with nodejs.
+A big shout out to the folks at https://laravel-tenancy.com/ who served as an inspiration for this project. This is a Node.js version of their PHP code. Please note that this project is not in any way up to what they offer on PHP but it will get better with time.
 
 Also will like to appreciate https://github.com/blugavere/node-repositories for being a source of inspiration for the repository used by the package.
 
-That being said let's get down to Node.js business.
+Let's get down to Node.js business.
 
 **Welcome to the unobtrusive Node.js package that makes your app multi tenant.**
 
-```
-Serving multiple websites, each with one or more hostnames from the same codebase.
-But with clear separation of databases.
+Serving multiple websites, each with one or more hostnames from the same codebase but with clear separation of databases.
 
-Suitable for all developers / companies or start-ups building the next software 
-as a service and are interested in re-using functionality for different clients.
-```
+Suitable for all developers / companies or start-ups building the next software as a service and are interested in re-using functionality for different clients.
 
 ## Dependencies
 
-This application relies heavily on sequelizejs for its database connections. Dialects supported as of now are MySQL, SQLite, PostgreSQL and MSSQL.
-You can read up here http://docs.sequelizejs.com/manual/installation/usage.html#dialects. Also the following packages are required dependencies
+This application relies heavily on sequelizejs for its database connections. Dialects supported as of now are MySQL, SQLite, PostgreSQL and MSSQL. You can read up here http://docs.sequelizejs.com/manual/installation/usage.html#dialects. Also the following packages are required dependencies
 
 ```
   -  "auto-bind": "^2.0.0",
@@ -47,8 +42,10 @@ $ npm install --save https://github.com/deye9/node-multi-tenant
 
 Drop all migrations for the tenants in the tenants folder.
 
-1. A global emitter event is created, kindly emit the req.headers.host to it. It is highly recommended this be done in your routers file / module. Below is a sample code
+1. A global emitter event is created, kindly emit the req.headers.host to it. It is highly recommended this be done in your routers file / module. Below is a sample code.
+
 ```
+
 /*
  * Routes file
  *
@@ -112,7 +109,7 @@ module.exports = {
 };
 ```
 
-2. Please call the tenantsInit() on your app init as it modifies your connection to create an array of connections. 
+2. Please call the tenantsInit() in your app init / startup module, as it modifies your connection to create an array of connections.
 Your main connection can be accessed via db['default']. Child connections will have the uuid passed to the db array for them to be available.
 
 ## Overview
@@ -160,9 +157,9 @@ Available Methods:
 
 **Available Commands**
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-                                                                                     CLI MANUAL
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------
+                                                CLI MANUAL
+----------------------------------------------------------------------------------------------------------------------------------------------
 
 
        exit                                        Kill the CLI (and the rest of the application)
