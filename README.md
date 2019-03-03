@@ -184,9 +184,7 @@ Available Methods:
 
        tenancy:migrate --{tenantID}                Run the database migrations on all or specific tenants. {IDs of tenants to migrate. e.g --tenantID=1 --tenantID=2}
 
-
 ----------------------------------------------------------------------------------------------------------------------------------------------
-
 After the package has been installed. Run the **tenancy:init** command to setup the need files. Once the command has finished executing, you will notice a tenants folder in your root directory.
 Inside that directory is a file called tenancy.js. Kind configure with the required path to the folders specified also remember to put in the name of the models you want to be shared. 
 This models on the default database. Below is an example of a valid tenancy.js file
