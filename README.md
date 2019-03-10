@@ -118,7 +118,7 @@ module.exports = {
 
 4. To disable logging to the console by the package, set the CONSOLE_LOGGER variable in your .env file to false and back to true to enable logging to the console. `CONSOLE_LOGGER=false`
 
-5. To enable / disable Audit log at the Repo level, set the value of the TENANCY_AUDIT_LOG variable in your .env file to true. Kindly note that the logging will only be implemented for Insert, Update and Delete calls that is action on by this package. Logging assumes that your primary key is named "id". `TENANCY_AUDIT_LOG=true`
+5. To enable / disable Audit log at the Repo level, set the value of the TENANCY_AUDIT_LOG variable in your .env file to true. Kindly note that the logging will only be implemented for Insert, Update and Delete calls that is action on by this package. Logging assumes that your primary key is named "id". Please note that when a tenant is dropped / deleted it is currently not logged. `TENANCY_AUDIT_LOG=true`
 
 ## Overview
 
