@@ -1,6 +1,6 @@
 {
   "name": "node-multi-tenant",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Multi-tenant Node.js Application",
   "main": "main.js",
   "scripts": {
