@@ -120,6 +120,8 @@ module.exports = {
 
 5. To enable / disable Audit log at the Repo level, set the value of the TENANCY_AUDIT_LOG variable in your .env file to true. Kindly note that the logging will only be implemented for Insert, Update and Delete calls that is action on by this package. Logging assumes that your primary key is named "id". Please note that when a tenant is dropped / deleted it is currently not logged. `TENANCY_AUDIT_LOG=true`
 
+6. The test accomplying this module was written to use PostgresSQL
+
 ## Overview
 
 To use any of the methods, kindly find a sample of what your import statement will look like:

@@ -9,7 +9,7 @@
     "eslint": "eslint **/*.js --fix --quiet",
     "coverage": "npm test && open coverage/index.html",
     "test-integration": "nyc --reporter=html --reporter=text mocha ./tests/Integration --exit && open coverage/index.html",
-    "test": "npm run eslint && nyc --reporter=html --reporter=text mocha tests --recursive --exit"
+    "test": "clear && npm run eslint && nyc --reporter=html --reporter=text mocha tests --recursive --exit"
   },
   "repository": {
     "type": "git",

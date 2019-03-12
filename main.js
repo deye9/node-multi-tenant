@@ -33,12 +33,11 @@ app.init = async () => {
   // Get a reference to the TenantRepository 
   const tenant = await new TenantRepository();
 
-  // Bind the connection event with the listner1 function
+  // Bind the connection event with the listener function
   em.on('requestUrl', tenant.currentDB);
 
   // Fire the requestUrl event.
   em.emit('requestUrl', process.env.TENANCY_DEFAULT_HOSTNAME.toLowerCase());
-
 };
 
 // Export the app
