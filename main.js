@@ -43,7 +43,6 @@ app.init = async () => {
 // Export the app
 module.exports = {
   init: () => app.init(),
-  currentDB: () => tenant.currentDB(),
   findAll: (modelName) => handlers.findAll(modelName),
   createTenant: (fqdn) => handlers.createTenant(fqdn),
   tenantExists: (fqdn) => handlers.tenantExists(fqdn),
@@ -52,7 +51,7 @@ module.exports = {
   delete: (modelName, key) => handlers.delete(modelName, key),
   findById: (modelName, id) => handlers.findById(modelName, id),
   executeQuery: (sqlCommand) => handlers.executeQuery(sqlCommand),
-  findFirst:(modelName, key) => handlers.findFirst(modelName, key),
+  findFirst: (modelName, key) => handlers.findFirst(modelName, key),
   getTenantConnectionString: () => handlers.getTenantConnectionString(),
   create: (modelName, dataObject) => handlers.create(modelName, dataObject),
   updateTenant: (fqdn, dataObject) => handlers.updateTenant(fqdn, dataObject),
