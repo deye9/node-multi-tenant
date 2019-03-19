@@ -27,6 +27,7 @@ This application relies heavily on sequelizejs for its database connections. Dia
   -  "pg": "^7.8.1",
   -  "sequelize": "^4.42.0",
   -  "sequelize-cli": "^5.4.0",
+  -  "dotenv": "^6.2.0"
 ```
 
 <!-- ## Caveats -->
@@ -120,7 +121,7 @@ module.exports = {
 
 5. To enable / disable Audit log at the Repo level, set the value of the TENANCY_AUDIT_LOG variable in your .env file to true. Kindly note that the logging will only be implemented for Insert, Update and Delete calls that is action on by this package. Logging assumes that your primary key is named "id". Please note that when a tenant is dropped / deleted it is currently not logged. `TENANCY_AUDIT_LOG=true`
 
-6. The test accomplying this module was written to use PostgresSQL
+6. The test accomplying this package / codebase was written to use PostgresSQL
 
 ## Overview
 

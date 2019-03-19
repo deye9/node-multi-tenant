@@ -1,4 +1,5 @@
-'use strict';
+'use strict'
+
 module.exports = (sequelize, DataTypes) => {
   const hostname = sequelize.define('hostname', {
     fqdn: DataTypes.STRING,
@@ -8,11 +9,11 @@ module.exports = (sequelize, DataTypes) => {
     uuid: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4
-    },
-  }, {});
+    }
+  }, {})
   hostname.associate = function (models) {
     // associations can be defined here
-  };
+  }
 
-  return hostname;
-};
+  return hostname
+}

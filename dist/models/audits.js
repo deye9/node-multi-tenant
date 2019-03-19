@@ -1,4 +1,5 @@
-'use strict';
+'use strict'
+
 module.exports = (sequelize, DataTypes) => {
   const audits = sequelize.define('audits', {
     user_type: DataTypes.STRING(191),
@@ -12,9 +13,9 @@ module.exports = (sequelize, DataTypes) => {
     ip_address: DataTypes.TEXT,
     user_agent: DataTypes.TEXT,
     tags: DataTypes.TEXT
-  }, {});
-  audits.associate = function(models) {
+  }, {})
+  audits.associate = function (models) {
     // associations can be defined here
-  };
-  return audits;
-};
+  }
+  return audits
+}
