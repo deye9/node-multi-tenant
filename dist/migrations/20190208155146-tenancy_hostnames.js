@@ -1,4 +1,5 @@
-'use strict';
+'use strict'
+
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('hostnames', {
@@ -15,12 +16,12 @@ module.exports = {
       },
       redirect_to: {
         type: Sequelize.STRING
-      },      
+      },
       force_https: {
         allowNull: false,
         defaultValue: false,
         type: Sequelize.BOOLEAN
-      },      
+      },
       under_maintenance_since: {
         allowNull: true,
         type: Sequelize.DATE
@@ -42,9 +43,9 @@ module.exports = {
         allowNull: true,
         type: Sequelize.DATE
       }
-    });
+    })
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('hostnames');
+    return queryInterface.dropTable('hostnames')
   }
-};
+}

@@ -1,44 +1,47 @@
+'use strict'
+
 /*
  * Primary file for App
  *
  */
 
 // Dependencies
-const handlers = require('./lib/handlers'),
-  {
-    init: cliInit
-  } = require('./lib/cli'),
-  {
-    TenantRepository
-  } = require('./lib/repository');
+const handlers = require('./lib/handlers')
+
+const {
+  init: cliInit
+} = require('./lib/cli')
+
+const {
+  TenantRepository
+} = require('./lib/repository')
 
 // get the reference of EventEmitter class of events module
-const events = require('events');
+const events = require('events')
 
 // create an object of EventEmitter class by using above reference
-global.em = new events.EventEmitter();
+global.em = new events.EventEmitter()
 
 // Declare the app
-let app = {};
+let app = {}
 
 /**
  * Init function
  *
  */
 app.init = async () => {
-
   // Start the CLI
-  cliInit();
+  cliInit()
 
-  // Get a reference to the TenantRepository 
-  const tenant = await new TenantRepository();
+  // Get a reference to the TenantRepository
+  const tenant = await new TenantRepository()
 
   // Bind the connection event with the listener function
-  em.on('requestUrl', tenant.currentDB);
+  em.on('requestUrl', tenant.currentDB)
 
   // Fire the requestUrl event.
-  em.emit('requestUrl', process.env.TENANCY_DEFAULT_HOSTNAME.toLowerCase());
-};
+  em.emit('requestUrl', process.env.TENANCY_DEFAULT_HOSTNAME.toLowerCase())
+}
 
 // Export the app
 module.exports = {
@@ -55,5 +58,5 @@ module.exports = {
   getTenantConnectionString: () => handlers.getTenantConnectionString(),
   create: (modelName, dataObject) => handlers.create(modelName, dataObject),
   updateTenant: (fqdn, dataObject) => handlers.updateTenant(fqdn, dataObject),
-  update: (modelName, key, dataObject) => handlers.update(modelName, key, dataObject),
-};
+  update: (modelName, key, dataObject) => handlers.update(modelName, key, dataObject)
+}
