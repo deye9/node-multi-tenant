@@ -1,6 +1,6 @@
 {
   "name": "node-multi-tenant",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Multi-tenant Node.js Application",
   "main": "main.js",
   "scripts": {
@@ -26,22 +26,22 @@
   },
   "homepage": "https://github.com/deye9/node-multi-tenant#readme",
   "dependencies": {
-    "auto-bind": "^2.0.0",
-    "pg": "^7.8.1",
-    "sequelize": "^4.42.0",
-    "sequelize-cli": "^5.4.0",
-    "dotenv": "^6.2.0"
+    "auto-bind": "^2.1.0",
+    "dotenv": "^6.2.0",
+    "pg": "^7.10.0",
+    "sequelize": "^5.8.2",
+    "sequelize-cli": "^5.4.0"
   },
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "chai-http": "^4.2.1",
-    "eslint": "^5.12.0",
+    "chai-http": "^4.3.0",
+    "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-import": "^2.17.2",
     "mocha": "^5.2.0",
     "nyc": "^13.1.0",
-    "sinon": "^7.2.3",
+    "sinon": "^7.3.2",
     "standard": "^12.0.1"
   }
 }
