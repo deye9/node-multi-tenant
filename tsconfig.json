@@ -1,0 +1,16 @@
+{
+    "extends": "@tsconfig/node20/tsconfig.json",
+    "compilerOptions": {
+      "lib": [
+        "ESNext"
+      ],
+      "outDir": "dist"
+    },
+    "include": [
+      "src"
+    ],
+    "exclude": [
+      "node_modules",
+      "**/*.test.ts"
+    ],
+  }

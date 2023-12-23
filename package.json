@@ -1,0 +1,45 @@
+{
+  "name": "node-multi-tenant",
+  "version": "1.0.0",
+  "description": "Multi-tenant Node.js Application",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node dist/index.js",
+    "build": "rimraf dist && swc ./src -d dist",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/deye9/node-multi-tenant.git"
+  },
+  "keywords": [
+    "Multi Tenant",
+    "Multi Tenancy"
+  ],
+  "author": "Adegbenga A. Adeye",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/deye9/node-multi-tenant/issues"
+  },
+  "homepage": "https://github.com/deye9/node-multi-tenant#readme",
+  "volta": {
+    "node": "20.10.0"
+  },
+  "dependencies": {
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@swc/cli": "^0.1.63",
+    "@swc/core": "^1.3.101",
+    "@tsconfig/node20": "^20.1.2",
+    "@types/node": "^20.10.5",
+    "commitizen": "^4.3.0",
+    "cz-conventional-changelog": "^3.3.0",
+    "rimraf": "^5.0.5"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
