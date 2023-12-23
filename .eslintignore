@@ -1,0 +1,4 @@
+/coverage/**
+/__tests__/**
+/dist/**
+jest.config.ts
