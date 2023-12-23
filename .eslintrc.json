@@ -1,0 +1,33 @@
+{
+    "env": {
+        "browser": true,
+        "commonjs": true,
+        "es2021": true,
+        "node": true
+    },
+    "extends": [
+        "standard-with-typescript",
+        "prettier"
+    ],
+    "parserOptions": {
+        "ecmaVersion": "latest"
+    },
+    "rules": {
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "semi": [
+            "error",
+            "always"
+        ],
+        "no-console": "off",
+        "no-var": 2,
+        "prefer-const": 2,
+        "prefer-arrow-callback": 1,
+        "no-extra-parens": 1,
+        "arrow-parens": [1, "as-needed"],
+        "arrow-body-style": ["error", "as-needed"],
+        "no-use-before-define": ["error", { "functions": false, "classes": false, "variables": false }]
+    }
+}
