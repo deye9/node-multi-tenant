@@ -63,6 +63,4 @@ typings/
 # ignore selected files / folders
 commands.txt
 *.npmignore
-tests
 dist
-node_modules
