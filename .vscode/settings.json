@@ -1,3 +1,7 @@
 {
-    "typescript.tsdk": "node_modules/typescript/lib"
-}
+    "files.watcherExclude": {
+      "**/.git/objects/**": true,
+      "**/.git/subtree-cache/**": true
+    },
+    "typescript.tsdk": "node_modules/typescript/lib",
+  }
