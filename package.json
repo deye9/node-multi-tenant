@@ -4,11 +4,13 @@
   "description": "Multi-tenant Node.js Application",
   "main": "src/index.js",
   "scripts": {
+    "test": "jest",
     "prepare": "husky install",
     "start": "node dist/index.js",
     "eslint": "eslint src/*.ts --fix --cache --quiet",
     "build": "rimraf dist && swc ./src -d dist && pnpm eslint",
-    "test": "jest",
+    "docker:start": "pnpm build && node --inspect=0.0.0.0 dist/index.js",
+    "docker:pgadmin": "docker compose up -d pgadmin && open http://localhost:5050/browser/",
     "push:test": "jest --no-coverage --passWithNoTests --changedSince origin/main"
   },
   "lint-staged": {

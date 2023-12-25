@@ -2,4 +2,3 @@
 /__tests__/**
 /dist/**
 jest.config.ts
-tsconfig.json
