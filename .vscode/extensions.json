@@ -1,5 +1,6 @@
 {
     "recommendations": [
+      "prisma.prisma",
       "dbaeumer.vscode-eslint",
       "esbenp.prettier-vscode",
       "gruntfuggly.triggertaskonsave",
