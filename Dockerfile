@@ -42,6 +42,12 @@ FROM deps as build
 #     --mount=type=cache,target=/root/.local/share/pnpm/store \
 #     pnpm install --frozen-lockfile
 
+### Prisma section
+COPY prisma/schema.prisma ./prisma/ 
+
+RUN pnpx prisma generate
+###
+
 # Copy the rest of the source files into the image.
 COPY . .
 
