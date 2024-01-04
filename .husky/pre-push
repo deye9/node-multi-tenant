@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-git fetch && pnpm push:test
+git fetch && pnpm docker:test

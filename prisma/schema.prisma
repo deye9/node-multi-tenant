@@ -1,8 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -13,13 +11,13 @@ datasource db {
 model Hostname {
   id                      String    @id
   fqdn                    String    @unique @db.VarChar(255)
-  redirect_to             String    
+  redirect_to             String
   force_https             Boolean   @default(false)
   under_maintenance_since DateTime?
-  uuid                    String    @db.Uuid @unique
+  db_name                 String    @unique
   createdAt               DateTime  @default(now())
   updatedAt               DateTime  @updatedAt
-  deletedAt               DateTime?  
+  deletedAt               DateTime?
 
   @@map(name: "hostnames") // use "hostnames" as the table name
 }
