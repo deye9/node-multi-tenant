@@ -4,19 +4,19 @@
   "description": "Multi-tenant Node.js Application",
   "main": "src/index.js",
   "scripts": {
-    "test": "jest",
     "prepare": "husky install",
-    "start": "node dist/index.js",
     "db:drop": "knex migrate:down",
     "db:migrate": "knex migrate:latest",
+    "docker": "docker compose --profile main up -d",
+    "start": "pnpm db:migrate && node dist/index.js",
     "eslint": "eslint src/*.ts --fix --cache --quiet",
     "build": "rimraf dist && swc ./src -d dist && pnpm eslint",
+    "test": "pnpm db:migrate && pnpm build && jest -i --coverage",
     "docker:db-drop": "docker compose run backend pnpm db:drop",
-    "docker:db-migrate": "docker compose run backend pnpm db:migrate",
-    "docker:start": "pnpm build && node --inspect=0.0.0.0 dist/index.js",
-    "push:test": "jest --no-coverage --passWithNoTests --changedSince origin/main",
-    "db:console": "docker compose run pg psql -h pg -U postgres -d multiTenant_dev",
+    "docker:test": "docker compose --env-file ./__tests__/.env --profile test up -d",
+    "docker:start": "pnpm db:migrate && pnpm build && node --inspect=0.0.0.0 dist/index.js",
     "docker:pgadmin": "docker compose up -d pgadmin && open http://localhost:5050/browser/",
+    "db:console": "docker compose run postgres psql -h postgres -U postgres -e postgres -d multiTenant_dev",
     "rebuild:be": "docker compose build backend && docker compose rm --force --stop backend && docker compose up -d backend"
   },
   "lint-staged": {
@@ -41,6 +41,7 @@
     "node": "20.10.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.3.1",
     "@jest/globals": "^29.7.0",
     "@swc/cli": "^0.1.63",
     "@swc/core": "^1.3.101",

@@ -4,10 +4,11 @@
       "lib": [
         "ESNext"
       ],
-      "outDir": "dist"
+      "outDir": "dist",
+      "useUnknownInCatchVariables": false
     },
     "include": [
-      "src", 
+      "src", "__tests__", 
     ],
     "exclude": [
       "node_modules",

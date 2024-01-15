@@ -2,9 +2,8 @@ services:
   backend:
     build:
       context: .
-    environment:
-      NODE_ENV: production
-      DATABASE_URL: postgres://postgres:postgres@pg:5432/multiTenant_dev
+    env_file:
+      - .env
     ports:
       - 1981:5000
       - 9229:9229 # for debugging
@@ -14,45 +13,79 @@ services:
       - /usr/src/app/.pnpm-store
     command: pnpm docker:start
     depends_on:
-      pg:
+      postgres:
         condition: service_healthy
-      
+    profiles: ["main"]
+
   pgadmin:
     image: dpage/pgadmin4
     restart: always
     container_name: pgadmin4_container
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
       PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin4@pgadmin.org}
     volumes:
-      - ./db/pgadmin:/var/lib/pgadmin
+      - pgadmin:/var/lib/pgadmin
     ports:
-      - "${PGADMIN_LISTEN_PORT:-5050}:80"
-    command: pnpm docker:pgadmin
+      - '${PGADMIN_LISTEN_PORT:-5050}:80'
     depends_on:
-      pg:
+      postgres:
         condition: service_healthy
+    profiles: ["main"]
 
-  pg:
-    image: postgres:15-alpine
+  postgres:
+    container_name: postgres
+    image: postgres:16-alpine
     user: postgres
     restart: always
-    container_name: postgres_container
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-multiTenant_dev}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    env_file:
+      - .env
     volumes:
-      - ./db/db-data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
     expose:
       - ${POSTGRES_PORT:-5432}
     healthcheck:
-      test: [ "CMD", "pg_isready" ]
+      test: ['CMD', 'pg_isready']
       interval: 10s
       timeout: 5s
       retries: 5
+    profiles: ["main"]
+
+  test:
+    build:
+      context: .
+    env_file:
+      - ./__tests__/.env
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/.pnpm-store
+    command: pnpm test
+    depends_on:
+      testdb:
+        condition: service_healthy
+    profiles: ["test"]
+  
+  testdb:
+    container_name: testdb
+    image: postgres:16-alpine
+    user: postgres
+    restart: always
+    env_file:
+      - ./__tests__/.env
+    volumes:
+      - pgtest:/var/lib/postgresql/data
+    expose:
+      - ${POSTGRES_PORT:-5432}
+    healthcheck:
+      test: ['CMD', 'pg_isready']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    profiles: ["test"]
 
 volumes:
-  db-data:
+  pgtest:
+  pgdata:
   pgadmin:

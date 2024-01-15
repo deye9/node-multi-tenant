@@ -22,14 +22,14 @@ Suitable for all developers / companies or start-ups building the next software 
 
 ## Dependencies
 
-This application relies heavily on sequelizejs for its database connections. Dialects supported as of now are MySQL, SQLite, PostgreSQL and MSSQL. You can read up here http://docs.sequelizejs.com/manual/installation/usage.html#dialects. Also the following packages are required dependencies
+This application relies heavily on Prisma and Knex for its database connections. You can read up here https://www.prisma.io/docs/orm/overview/databases as regards the databases supported. Also the following packages are required dependencies alongside the minimum versions of the respective packages used
 
 ```
-  -  "auto-bind": "^2.0.0",
-  -  "pg": "^7.8.1",
-  -  "sequelize": "^4.42.0",
-  -  "sequelize-cli": "^5.4.0",
-  -  "dotenv": "^6.2.0"
+    - "@prisma/client": "^5.7.1",
+    - "knex": "^3.1.0",
+    - "nanoid": "3",
+    - "pg": "^8.11.3",
+    - "typescript": "^5.3.3"
 ```
 
 <!-- ## Caveats -->
@@ -38,13 +38,20 @@ This application relies heavily on sequelizejs for its database connections. Dia
 
 ```sh
 $ npm i node-multi-tenant
+$ yarn i node-multi-tenant
+$ pnpm i node-multi-tenant
 ```
 
 **or**
 
 ```sh
 $ npm install --save https://github.com/deye9/node-multi-tenant
+$ yarn install --save https://github.com/deye9/node-multi-tenant
+$ pnpm install --save https://github.com/deye9/node-multi-tenant
 ```
+
+## Flow
+1. Tenant db_name is optional. If supplied the value given will be used to create the database name else it will be assigned a random *16* string value.
 
 ## Before you start
 

@@ -20,8 +20,14 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
+    - name: Install pnpm
+      run: npm install -g pnpm
+
     - name: Install dependencies
-      run: npm install
+      run: pnpm install
+
+    - name: Install docker
+      run: sudo apt-get install docker-ce docker-ce-cli containerd.io
 
     - name: Run the tests
-      run: npm test -- --coverage
+      run: pnpm docker:test
