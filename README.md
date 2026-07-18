@@ -1,512 +1,654 @@
-# Multi-tenant Node.js Application
+# node-multi-tenant
 
-<img src="https://cdn-images-1.medium.com/max/1600/1*YJHmalZ71_3AekY06edhPg.png" alt="Multi-tenant Node.js Application">
+`node-multi-tenant` helps one Node.js application serve many customers, brands, or websites from the same codebase while keeping each tenant's data in its own database.
 
-(c) https://blog.lftechnology.com/designing-a-secure-and-scalable-multi-tenant-application-on-node-js-15ae13dda778
+In plain terms: if you are building a SaaS product and want `customer-a.example.com` and `customer-b.example.com` to run on the same application but store data separately, this package gives you the tenant lookup, tenant database connection management, setup commands, and repository helpers to do that with minimal wiring.
 
-## Introduction
+The package is authored in TypeScript, published as CommonJS, and includes generated type declarations. Existing JavaScript projects can continue using `require('node-multi-tenant')`; TypeScript projects get typed imports.
 
-A big shout out to the folks at https://laravel-tenancy.com/ who served as an inspiration for this project. This is a Node.js version of their PHP code. Please note that this project is not in any way up to what they offer on PHP but it will get better with time.
+## Who This Is For
 
-Also will like to appreciate https://github.com/blugavere/node-repositories for being a source of inspiration for the repository used by the package.
+Use this package when you want:
 
-Let's get down to Node.js business.
+- One application codebase serving multiple tenant hostnames.
+- A default database that stores tenant hostname records.
+- A separate database connection per tenant.
+- Helper methods for tenant-aware create, read, update, delete, truncate, and raw SQL calls.
+- A package-friendly integration that can be initialized during application startup.
 
-**Welcome to the unobtrusive Node.js package that makes your app multi tenant.**
+This package is useful for SaaS products, white-label platforms, internal portals with client-specific data separation, and applications where each customer should have isolated database storage.
 
-Serving multiple websites, each with one or more hostnames from the same codebase but with clear separation of databases.
+## How It Works
 
-Suitable for all developers / companies or start-ups building the next software as a service and are interested in re-using functionality for different clients.
+At a high level, the package uses two kinds of database connections:
 
-## Dependencies
+1. The default connection points to your main application database. It contains the tenant hostname table.
+2. Tenant connections point to tenant-specific databases. Each tenant database is selected by resolving the incoming request hostname.
 
-This application relies heavily on sequelizejs for its database connections. Dialects supported as of now are MySQL, SQLite, PostgreSQL and MSSQL. You can read up here http://docs.sequelizejs.com/manual/installation/usage.html#dialects. Also the following packages are required dependencies
+The normal request flow looks like this:
 
-```
-  -  "auto-bind": "^2.0.0",
-  -  "pg": "^7.8.1",
-  -  "sequelize": "^4.42.0",
-  -  "sequelize-cli": "^5.4.0",
-  -  "dotenv": "^6.2.0"
-```
+1. Your application starts and calls `init()`.
+2. The package reads `tenants/tenancy.ts` and your Sequelize database config.
+3. The package loads the default database connection.
+4. The package reads the known hostnames from the default database.
+5. For each incoming request, your app emits the request host, for example `tenant-a.example.com`.
+6. The package switches the active tenant context for repository calls.
+7. Calls like `findAll('Users')` or `create('Orders', data)` run against the active tenant database.
 
-<!-- ## Caveats -->
+## Requirements
+
+- Node.js project using CommonJS or TypeScript.
+- Sequelize v5-compatible setup.
+- `sequelize-cli` available in the consuming application.
+- A Sequelize database config file, usually `database/models/index`.
+- Tenant model files and migrations organized in your application.
+- PostgreSQL is the current primary tested database path for this package.
+
+Installed runtime dependencies include:
+
+- `auto-bind`
+- `dotenv`
+- `pg`
+- `sequelize`
+- `sequelize-cli`
 
 ## Installation
 
+Install from npm:
+
 ```sh
-$ npm i node-multi-tenant
+npm install node-multi-tenant
 ```
-**or**
+
+Or install directly from GitHub:
+
 ```sh
-$ npm install --save https://github.com/deye9/node-multi-tenant
+npm install --save https://github.com/deye9/node-multi-tenant
 ```
 
-## Before you start
+## Quick Start
 
-Drop all migrations for the tenants in the tenants folder.
+### 1. Install The Package
 
-1. A global emitter event is created, kindly emit the req.headers.host to it. It is highly recommended this be done in your routers file / module. Below is a sample code.
-
+```sh
+npm install node-multi-tenant
 ```
 
-/*
- * Routes file
- *
- */
+### 2. Add The Tenancy Config Template
 
-// Dependencies
-const handlers = require('./lib/handlers');
+Run the package CLI command from your application root:
 
-const requestRouter = {
-    /**
-     * handles all route request.
-     *
-     * @param {String} trimmedPath [Fully Qualified Domain Name]
-     * @param {String} requestUrl [req.headers.host]
-     * @returns {String}
-     */
-    handleRequest(trimmedPath, requestUrl) {
+```sh
+node -e "require('node-multi-tenant').init({ startCli: true }).catch(console.error)"
+```
 
-        requestRouter.eventManager(requestUrl);
+When the prompt opens, run:
 
-        switch (trimmedPath) {
-            case '':
-                return handlers.index;
+```text
+tenancy:init
+```
 
-            case 'favicon.ico':
-                return handlers.favicon;
+This copies the `tenants` folder into your project. New projects should use `tenants/tenancy.ts`.
 
-            case 'account/create':
-                return handlers.accountCreate;
+### 3. Configure `tenants/tenancy.ts`
 
-            case 'session/create':
-                return handlers.sessionCreate;
+The generated config tells the package where your models, migrations, seeders, and default Sequelize config live.
 
-            case 'ping':
-                return handlers.ping;
+```ts
+import type { TenancyConfig } from "node-multi-tenant";
 
-            case 'api/menu':
-                return handlers.menus;
-
-            case 'public':
-                return handlers.public;
-
-            default:
-                break;
-        }
-    },
-
-    /**
-     * emit the req.headers.host as an event to be consumed.
-     *
-     * @param {String} requestUrl
-     */
-    eventManager(requestUrl) {
-        em.emit('requestUrl', requestUrl);
-    }
+const config: TenancyConfig = {
+  datastore: {
+    modelsfolder: "database/models",
+    seedersfolder: "database/seeders",
+    migrationsfolder: "database/migrations",
+    dbconfigfile: "database/models/index",
+  },
+  "models-shared": {
+    tenancy_hostname: "hostname.js",
+  },
 };
 
-// Export the routes
-module.exports = {
-    handleRequest: (trimmedPath, requestUrl) => requestRouter.handleRequest(trimmedPath, requestUrl)
+export default config;
+```
+
+Configuration fields:
+
+- `modelsfolder`: folder containing your Sequelize model files.
+- `seedersfolder`: folder containing your Sequelize seed files.
+- `migrationsfolder`: folder containing your Sequelize migration files.
+- `dbconfigfile`: module path to your Sequelize database context.
+- `models-shared`: model files that belong to the default database and should not be loaded into every tenant context.
+
+Existing applications that still have `tenants/tenancy.js` are supported as a fallback, but `tenants/tenancy.ts` is the recommended config file for new setups.
+
+### 4. Configure Environment Variables
+
+Add these to your `.env` file as needed:
+
+```env
+TENANCY_DEFAULT_HOSTNAME=sample.dev
+CONSOLE_LOGGER=false
+TENANCY_AUDIT_LOG=false
+```
+
+Environment variables:
+
+- `TENANCY_DEFAULT_HOSTNAME`: host that should use the default database context.
+- `CONSOLE_LOGGER`: set to `true` to allow package log messages.
+- `TENANCY_AUDIT_LOG`: set to `true` to write audit records for supported repository mutations.
+
+Audit logging currently applies to package-driven insert, update, delete, and truncate operations. It assumes the primary key field is named `id`.
+
+### 5. Initialize Tenancy During App Startup
+
+JavaScript CommonJS example:
+
+```js
+const { EventEmitter } = require("events");
+const tenancy = require("node-multi-tenant");
+
+global.em = new EventEmitter();
+
+async function startApp() {
+  await tenancy.init();
+  // Start your HTTP server after tenancy is initialized.
+}
+
+startApp().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
+```
+
+TypeScript example:
+
+```ts
+import { EventEmitter } from "events";
+import { init } from "node-multi-tenant";
+
+(global as any).em = new EventEmitter();
+
+async function startApp(): Promise<void> {
+  await init();
+  // Start your HTTP server after tenancy is initialized.
+}
+
+startApp().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
+```
+
+### 6. Emit The Request Host On Every Request
+
+The package listens for a `requestUrl` event. Emit the request hostname before calling tenant-aware package methods.
+
+Express example:
+
+```js
+app.use((req, res, next) => {
+  global.em.emit("requestUrl", req.headers.host);
+  next();
+});
+```
+
+Generic router example:
+
+```js
+function handleRequest(req, res) {
+  global.em.emit("requestUrl", req.headers.host);
+
+  // Your route handler can now call tenant-aware repository helpers.
+}
+```
+
+Best result: emit the request host as early as possible in your request pipeline, before controller or service code reads tenant data.
+
+## Advanced Initialization
+
+For larger applications, tests, worker processes, or dependency-injected systems, use `TenantService` directly.
+
+```ts
+import { EventEmitter } from "events";
+import { TenantService, type TenancyConfig } from "node-multi-tenant";
+
+const config: TenancyConfig = {
+  datastore: {
+    modelsfolder: "database/models",
+    seedersfolder: "database/seeders",
+    migrationsfolder: "database/migrations",
+    dbconfigfile: "database/models/index",
+  },
+  "models-shared": {
+    tenancy_hostname: "hostname.js",
+  },
 };
+
+const tenancy = new TenantService({
+  cwd: process.cwd(),
+  config,
+  eventEmitter: new EventEmitter(),
+  startCli: false,
+});
+
+await tenancy.init();
 ```
 
-2. Please call the tenantsInit() in your app init / startup module, as it modifies your connection to create an array of connections. Your main connection can be accessed via db['default']. Child connections will have the uuid passed to the db array for them to be available.
+`TenantService` options:
 
-3. In your .env you need to set the TENANCY_DEFAULT_HOSTNAME variable. e.g  `TENANCY_DEFAULT_HOSTNAME=sample.dev`
+- `cwd`: project root used for loading config, models, and migrations.
+- `config`: explicit tenancy config. Use this when you do not want the package to read `tenants/tenancy.ts` from disk.
+- `eventEmitter`: custom event emitter. If omitted, the package uses `global.em`.
+- `startCli`: set to `true` to start the interactive tenancy CLI.
 
-4. To disable logging to the console by the package, set the CONSOLE_LOGGER variable in your .env file to false and back to true to enable logging to the console. `CONSOLE_LOGGER=false`
+## CLI Commands
 
-5. To enable / disable Audit log at the Repo level, set the value of the TENANCY_AUDIT_LOG variable in your .env file to true. Kindly note that the logging will only be implemented for Insert, Update and Delete calls that is action on by this package. Logging assumes that your primary key is named "id". Please note that when a tenant is dropped / deleted it is currently not logged. `TENANCY_AUDIT_LOG=true`
+Start the interactive CLI with:
 
-6. The test accomplying this package / codebase was written to use PostgresSQL
-
-## Overview
-
-To use any of the methods, kindly find a sample of what your import statement will look like:
-
-```
-  {
-    create: create,
-    update: update,
-    delete: _delete,
-    findAll: findAll,
-    init: tenantsInit,
-    truncate: truncate,
-    findById: findById,
-    currentDB: currentDB,
-    findFirst: findFirst,
-    createTenant: newTenant,
-    tenantExists: validTenant,
-    deleteTenant: removeTenant,
-    updateTenant: updateTenant,
-    executeQuery: executeQuery,
-    getTenantConnectionString: getTenantConnectionString
-  } = require('node-multi-tenant');
+```js
+require("node-multi-tenant").init({ startCli: true }).catch(console.error);
 ```
 
-Available Methods:
+Available commands:
 
-- [cli methods](#cli)
-- [create](#create)
-- [currentDB](#currentDB)
-- [createTenant](#createTenant)
-- [delete](#delete)
-- [deleteTenant](#deleteTenant)
-- [executeQuery](#executeQuery)
-- [findAll](#findAll)
-- [findById](#findById)
-- [findFirst](#findFirst)
-- [getTenantConnectionString](#getTenantConnectionString)
-- [init](#init)
-- [tenantExists](#tenantExists)
-- [truncate](#truncate)
-- [update](#update)
-- [updateTenant](#updateTenant)
+| Command                      | What It Does                                                            |
+| ---------------------------- | ----------------------------------------------------------------------- |
+| `help`                       | Shows the CLI help page.                                                |
+| `man`                        | Alias for `help`.                                                       |
+| `exit`                       | Stops the CLI process.                                                  |
+| `tenancy:init`               | Copies the `tenants` config folder into your project.                   |
+| `tenancy:install`            | Installs tenancy migrations/models and prepares the database structure. |
+| `tenancy:db:seed`            | Runs all configured Sequelize seeders.                                  |
+| `tenancy:db:unseed --recent` | Rolls back the most recent seed.                                        |
+| `tenancy:db:unseed --all`    | Rolls back all seeds.                                                   |
+| `tenancy:migrate`            | Runs Sequelize migrations.                                              |
+| `tenancy:migrate:rollback`   | Rolls back the last migration.                                          |
+| `tenancy:migrate:refresh`    | Rolls back seeds and the last migration, then reruns migrations.        |
 
-**[⬆ back to top](#Overview)**
+Important: `tenancy:install` runs database setup commands including `sequelize db:drop`, `sequelize db:create`, and migrations. Use it only in the intended environment and make sure you have backups before running it against any database that contains important data.
 
-## cli
+## Public API
 
-**Available Commands**
+You can import the package as CommonJS:
 
-----------------------------------------------------------------------------------------------------------------------------------------------
-                                                CLI MANUAL
-----------------------------------------------------------------------------------------------------------------------------------------------
-
-
-       exit                                        Kill the CLI (and the rest of the application)
-
-       man                                         Show this help page
-
-       help                                        Alias of the "man" command
-
-       tenancy:init                                Installs the tenancy configurations file.
-
-       tenancy:install                             Install the tenancy files based on configurations in the tenants/tenancy.js file
-
-       tenancy:db:seed                             Seed the database with records
-
-       tenancy:recreate                            Command to recreate all tenant databases that do not exist
-
-       tenancy:db:unseed --{Action}                Undo all seeds [Action = recent, all]
-
-       tenancy:migrate:refresh                     Reset and re-run all migrations
-
-       tenancy:migrate:rollback                    Rollback the last database migration
-
-       tenancy:migrate --{tenantID}                Run the database migrations on all or specific tenants. {IDs of tenants to migrate. e.g --tenantID=1 --tenantID=2}
-
-----------------------------------------------------------------------------------------------------------------------------------------------
-
-After the package has been installed. Run the **tenancy:init** command to setup the need files. Once the command has finished executing, you will notice a tenants folder in your root directory.
-Inside that directory is a file called tenancy.js. Kind configure with the required path to the folders specified also remember to put in the name of the models you want to be shared. 
-This models on the default database. Below is an example of a valid tenancy.js file
-
-```
-/*
- *
- * Configuaration file for the Node Multi Tenant Application.
- *
- */
-
-// Dependencies
-require('dotenv').config();
-
-module.exports = {
-    /**
-     * Contains all the paths to your datastores.
-     */
-    'datastore': {
-        modelsfolder: 'database/models',
-        seedersfolder: 'database/seeders',
-        migrationsfolder: 'database/migrations',
-        dbconfigfile: 'database/models/index'
-    },
-    'models-shared': {
-        'tenancy_hostname': 'hostname.js',
-    }
-};
+```js
+const {
+  init,
+  create,
+  update,
+  delete: deleteRecord,
+  findAll,
+  truncate,
+  findById,
+  findFirst,
+  createTenant,
+  tenantExists,
+  deleteTenant,
+  updateTenant,
+  executeQuery,
+  getTenantConnectionString,
+} = require("node-multi-tenant");
 ```
 
-Once you are done configuring your tenancy.js file, you now run **tenancy:install** to install and setup tenancy fully in your application and you are officially good to go.
+Or with TypeScript / ES imports:
 
-**[⬆ back to top](#Overview)**
+```ts
+import {
+  init,
+  create,
+  update,
+  deleteRecord,
+  findAll,
+  truncate,
+  findById,
+  findFirst,
+  createTenant,
+  tenantExists,
+  deleteTenant,
+  updateTenant,
+  executeQuery,
+  getTenantConnectionString,
+  TenantService,
+} from "node-multi-tenant";
+```
 
-## create
+### `init(options?)`
 
-Creates a record in the tenant using the model name supplied. You can either pass in a single object or an array of objects.
+Initializes tenancy. Call this once during application startup before serving requests.
 
-**Parameters**
+```js
+await init();
+```
 
-- modelName of type String [Contains the name of the model to be used]
-- dataObject of type Object [Key value representation of the data to be created]
+With options:
 
-**Sample Code**
+```js
+await init({
+  cwd: process.cwd(),
+  config: tenancyConfig,
+  eventEmitter: global.em,
+  startCli: false,
+});
+```
 
- const result = await create('Users', {
-   firstName: 'First Name',
-   lastName: 'Last Name',
-   email: 'Email Address'
- }));
+### `create(modelName, dataObject)`
 
- or
+Creates one or more records in the current tenant database.
 
-  const result = await create('Users', [
-    { firstName: 'test', lastName: "valid", email: "tested@yahoo.com" },
-    { firstName: 'test1', lastName: "valid1", email: "tested1@yahoo.com" },
-    { firstName: 'test2', lastName: "valid2", email: "tested2@yahoo.com" },
-    { firstName: 'test3', lastName: "valid3", email: "tested3@yahoo.com" }
-  ]);
+```js
+const user = await create("Users", {
+  firstName: "Ada",
+  lastName: "Lovelace",
+  email: "ada@example.com",
+});
+```
 
-**Return Type:**
+Bulk create:
 
-Promise of type Model or Promise of type Array of Model
+```js
+const users = await create("Users", [
+  { firstName: "Ada", email: "ada@example.com" },
+  { firstName: "Grace", email: "grace@example.com" },
+]);
+```
 
-**[⬆ back to top](#Overview)**
+### `findAll(modelName, key?)`
 
-## currentDB
+Finds records in the current tenant database.
 
-**[⬆ back to top](#Overview)**
+```js
+const users = await findAll("Users");
+const activeUsers = await findAll("Users", { active: true });
+```
 
-## createTenant
+### `findFirst(modelName, key)`
 
- Creates a tenant.
+Finds the first matching record.
 
-**Parameters**
+```js
+const user = await findFirst("Users", { email: "ada@example.com" });
+```
 
-- fqdn of type String [Fully Qualified Domain Name]
+### `findById(modelName, id)`
 
-**Sample Code**
+Finds a record by primary key.
 
- const result = await newTenant('sample.dev');
+```js
+const user = await findById("Users", 16);
+```
 
-**Return Type:**
+### `update(modelName, key, dataObject)`
 
-Promise of type Model
+Updates matching records in the current tenant database.
+
+```js
+await update("Users", { id: 16 }, { lastName: "Byron" });
+```
+
+### `deleteRecord(modelName, key)` / `delete(modelName, key)`
+
+Deletes matching records in the current tenant database.
+
+```js
+await deleteRecord("Users", { id: 16 });
+```
+
+CommonJS alias:
+
+```js
+const { delete: removeRecord } = require("node-multi-tenant");
+
+await removeRecord("Users", { id: 16 });
+```
+
+### `truncate(modelName)`
+
+Truncates a model table in the current tenant database.
+
+```js
+await truncate("TemporaryRecords");
+```
+
+Use this carefully. It removes all rows for the model in the active tenant database.
+
+### `executeQuery(sqlCommand)`
+
+Executes raw SQL against the current tenant database.
+
+```js
+const rows = await executeQuery("select * from users limit 10");
+```
+
+Best result: use parameterized Sequelize model methods for user-provided data. Only use raw SQL for trusted, reviewed queries.
+
+### `getTenantConnectionString()`
+
+Returns the connection string for the current tenant context.
+
+```js
+const connectionString = await getTenantConnectionString();
+```
+
+### `createTenant(fqdn)`
+
+Creates a new tenant hostname record, provisions the tenant database, runs tenant migrations, runs seeders, and caches the hostname.
+
+```js
+const tenant = await createTenant("customer-a.example.com");
+```
+
+Returns:
+
+```js
 {
-    'website_id': id,
-    'uuid': uuid,
-    'fqdn': fqdn
-};
+  website_id: 1,
+  uuid: 'generated-tenant-database-id',
+  fqdn: 'customer-a.example.com'
+}
+```
 
-**[⬆ back to top](#Overview)**
+### `tenantExists(fqdn)`
 
-## delete
+Checks whether a tenant hostname exists.
 
-Remove the record from the tenant using the model name and key supplied
+```js
+const tenant = await tenantExists("customer-a.example.com");
+```
 
-**Parameters**
+### `updateTenant(fqdn, dataObject)`
 
-- modelName of type String [Contains the name of the model to be used]
-- key of type Object [Key value representation of the data to be deleted]
+Updates a tenant hostname record. Protected identity fields such as `id`, `fqdn`, and `uuid` are preserved from the existing tenant record.
 
-**Sample Code**
+```js
+await updateTenant("customer-a.example.com", {
+  redirect_to: "https://www.example.com",
+  force_https: true,
+  under_maintenance_since: null,
+});
+```
 
- const result = await _delete('Users', {id:2});
+### `deleteTenant(fqdn)`
 
-**Return Type:**
+Deletes a tenant hostname record, closes the tenant connection, drops the tenant database, and removes the hostname from the in-memory cache.
 
-Promise of Object [Returns back the key passed in]
+```js
+await deleteTenant("customer-a.example.com");
+```
 
-**[⬆ back to top](#Overview)**
+Use this carefully. It removes the tenant database.
 
-## deleteTenant
+## Recommended Application Structure
 
-Deletes a tenant's records from the DB alongside the created DB.
+A typical consuming application should look similar to this:
 
-**Parameters**
+```text
+your-app/
+  database/
+    migrations/
+      tenants/
+    models/
+      index.js
+      hostname.js
+      user.js
+    seeders/
+  tenants/
+    tenancy.ts
+  src/
+    app.js
+```
 
-- fqdn of type String [Fully Qualified Domain Name]
+Recommended responsibilities:
 
-**Sample Code**
+- Keep shared/default models, such as the hostname model, listed under `models-shared`.
+- Keep tenant-specific models out of `models-shared` so they are loaded per tenant database.
+- Keep tenant migrations under `database/migrations/tenants` after installation.
+- Initialize tenancy before accepting traffic.
+- Emit `requestUrl` once per request before reading or writing tenant data.
 
- const result = await removeTenant('sample.dev');
+## Best Practices For Reliable Results
 
-**Return Type:**
+### Initialize Once
 
-Promise of type String [UUID of database]
+Call `init()` once during application startup. Avoid calling it in every request handler.
 
-**[⬆ back to top](#Overview)**
+### Emit The Host Before Data Access
 
-## executeQuery
+Any route that calls tenant-aware methods must emit the current host first.
 
-Executes a raw sql query against the database.
+```js
+global.em.emit("requestUrl", req.headers.host);
+```
 
-**Parameters**
+### Treat The Default Host Separately
 
-- modelName of type String [Contains the name of the model to be used]
-- sqlCommand of type String [Sql Command to be executed]
+Set `TENANCY_DEFAULT_HOSTNAME` for the hostname that should use the default database.
 
-**Sample Code**
+```env
+TENANCY_DEFAULT_HOSTNAME=sample.dev
+```
 
- const result = await executeQuery('hostname', 'select * from hostnames');
+### Use Explicit Service Instances For Tests And Workers
 
-**Return Type:**
+For tests, queues, cron jobs, and worker processes, prefer `TenantService` with an explicit config and event emitter. This avoids hidden global state and makes behavior easier to reason about.
 
-Promise of type Array Model
+### Keep Tenant Setup Commands Away From Production Accidents
 
-**[⬆ back to top](#Overview)**
+Commands like `tenancy:install`, `deleteTenant`, and `truncate` can remove data. Run them only when you mean to change or remove data, and make sure backups exist for important environments.
 
-## findAll
+### Use Audit Logging Deliberately
 
-Gets an array of the values from the tenant based on conditions specified.
+Turn on `TENANCY_AUDIT_LOG=true` only when your tenant databases have the expected audits model/table and your records use `id` as the primary key.
 
-**Parameters**
+### Prefer Model Methods For User Input
 
-- modelName of type String [Contains the name of the model to be used]
-- key of type Object [Key value representation of the data to be searched]
+Use `create`, `update`, `findAll`, `findFirst`, and `findById` for normal application work. Reserve `executeQuery` for trusted SQL.
 
-**Sample Code**
+## Example Express Integration
 
-const result = await findAll('Users'));
+```js
+const express = require("express");
+const { EventEmitter } = require("events");
+const { init, findAll, create, createTenant } = require("node-multi-tenant");
 
-or
+global.em = new EventEmitter();
 
-const result = await findAll('Users', {id: {[Op.gte]: 3}}));
+async function main() {
+  await init();
 
-**Return Type:**
+  const app = express();
+  app.use(express.json());
 
-Promise of type Array of Model
-
-**[⬆ back to top](#Overview)**
-
-## findById
-
-Gets the record from the tenant database by the Primary Key given.
-
-**Parameters**
-
-- modelName of type String [Contains the name of the model to be used]
-- id of type Integer [id of the field which is an integer value]
-
-**Sample Code**
-
-const result = await findById('Users', 16);
-
-**Return Type:**
-
-Promise of type Model
-
-**[⬆ back to top](#Overview)**
-
-## findFirst
-
-Gets the first record from the tenant database matching the criteria given.
-
-**Parameters**
-
-- modelName of type String [Contains the name of the model to be used]
-- key of type Object [Key value representation of the data to be searched]
-
-**Sample Code**
-
- const result = await findFirst('Users', {id: 10});
-
-**Return Type:**
-
-Promise of type String
-
-**[⬆ back to top](#Overview)**
-
-## getTenantConnectionString
-
-Returns the connection string of the current / active tenant.
-
-**Sample Code**
-
- const result = await getTenantConnectionString();
-
-**Return Type:**
-
-Promise of type String
-
-**[⬆ back to top](#Overview)**
-
-## init
-
-Starts the multi_tenants CLI
-
-**Sample Code**
-
- const result = await tenantsInit();
-
-**[⬆ back to top](#Overview)**
-
-## tenantExists
-
-Checks if the tenant exists.
-
-**Parameters**
-
-- fqdn of type String [Fully Qualified Domain Name]
-
-**Sample Code**
-
- const result = await validTenant('sample.dev');
-
-**Return Type:**
-
-Promise of type Model
-
-**[⬆ back to top](#Overview)**
-
-## truncate
-
-Truncates a table on the tenant.
-
-**Sample Code**
-
- const result = await truncate('Users');
-
-**Return Type:**
-
-Promise of type Integer The number of truncated rows
-
-**[⬆ back to top](#Overview)**
-
-## update
-
-Updates the record in the tenant using the model name and the key supplied.
-
-**Parameters**
-
-- modelName of type String [Contains the name of the model to be used]
-- key of type Object [Key value representation of the data to be updated]
-- dataObject of type Object [Key value representation of the data to be updated]
-
-**Sample Code**
-
- const result = await update('Users', {id:4}, { firstName: 'new First Name', lastName: 'new Last Name', email: 'new Email Address' });
-
-**Return Type:**
-
-Promise of type Array of Objects [key, dataObject]
-
-**[⬆ back to top](#Overview)**
-
-## updateTenant
-
-Updates the tenant record to the new records passed in.
-
-**Parameters**
-
-- fqdn of type String [Fully Qualified Domain Name]
-- dataObject of type Object [Key value representation of the tenant data to be updated]
-
-**Sample Code**
-
- const result =   await updateTenant('sample.dev', {
-    fqdn: 'qw',
-    redirect_to: 'rtwewe',
-    force_https: true,
-    under_maintenance_since: null
+  app.use((req, res, next) => {
+    global.em.emit("requestUrl", req.headers.host);
+    next();
   });
 
-**Return Type:**
+  app.get("/users", async (req, res, next) => {
+    try {
+      const users = await findAll("Users");
+      res.json(users);
+    } catch (error) {
+      next(error);
+    }
+  });
 
-Promise of type Model
+  app.post("/users", async (req, res, next) => {
+    try {
+      const user = await create("Users", req.body);
+      res.status(201).json(user);
+    } catch (error) {
+      next(error);
+    }
+  });
 
-**[⬆ back to top](#Overview)**
+  app.post("/tenants", async (req, res, next) => {
+    try {
+      const tenant = await createTenant(req.body.fqdn);
+      res.status(201).json(tenant);
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.listen(3000, () => {
+    console.log("Application listening on port 3000");
+  });
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
+```
+
+## Troubleshooting
+
+### Tenant Data Is Coming From The Wrong Database
+
+Check that your app emits `requestUrl` before calling tenant-aware methods.
+
+```js
+global.em.emit("requestUrl", req.headers.host);
+```
+
+Also confirm `TENANCY_DEFAULT_HOSTNAME` is set correctly.
+
+### The Package Cannot Find Models Or Migrations
+
+Check `tenants/tenancy.ts`. The folder paths are resolved from your application root.
+
+### The Package Cannot Find The Default Database Context
+
+Check `datastore.dbconfigfile`. It should point to the module that exports your Sequelize database context, usually `database/models/index`.
+
+### CLI Commands Do Not Run
+
+Make sure `sequelize-cli` is installed and available in `node_modules/.bin/sequelize` in your application.
+
+### Audit Logs Are Not Written
+
+Check that `TENANCY_AUDIT_LOG=true`, the audits model/table exists in tenant databases, and records use an `id` primary key.
+
+## Development
+
+For package contributors:
+
+```sh
+npm install
+npm run build
+npm test
+npm run coverage
+```
+
+Current test coverage is above 80% across the primary metrics.
+
+## Credits
+
+This project was inspired by the Laravel Tenancy ecosystem and by repository patterns from `node-repositories`.
+
+Original multi-tenant application design reference: https://blog.lftechnology.com/designing-a-secure-and-scalable-multi-tenant-application-on-node-js-15ae13dda778
+
+## License
+
+ISC

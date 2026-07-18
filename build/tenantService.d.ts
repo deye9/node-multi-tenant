@@ -1,0 +1,33 @@
+import { Dictionary, TenantInitOptions } from "./types";
+export declare class TenantService {
+    private readonly cwd;
+    private readonly eventEmitter;
+    private readonly configLoader;
+    private readonly config;
+    private readonly registry;
+    private readonly repository;
+    private readonly cli;
+    private currentTenantId;
+    private initialized;
+    private initialization?;
+    constructor(options?: TenantInitOptions);
+    init(): Promise<void>;
+    private initialize;
+    setCurrentTenant(hostname?: string): Promise<void>;
+    createTenant(fqdn: string): Promise<Dictionary>;
+    deleteTenant(fqdn: string): Promise<number>;
+    tenantExists(fqdn: string): Promise<Dictionary>;
+    updateTenant(fqdn: string, dataObject: Dictionary): Promise<any>;
+    getTenantConnectionString(): Promise<string>;
+    truncate(modelName: string): Promise<number>;
+    delete(modelName: string, key: Dictionary): Promise<number>;
+    create(modelName: string, dataObject: Dictionary | Dictionary[]): Promise<any>;
+    update(modelName: string, key: Dictionary, dataObject: Dictionary): Promise<Dictionary>;
+    findById(modelName: string, id: number): Promise<Dictionary>;
+    findFirst(modelName: string, key: Dictionary): Promise<Dictionary>;
+    findAll(modelName: string, key?: Dictionary): Promise<any[]>;
+    executeQuery(sqlCommand: string): Promise<any[]>;
+    private tenantDbUUID;
+    private createTenantDatabase;
+    private ensureInitialized;
+}
