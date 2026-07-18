@@ -1,10 +1,14 @@
 import { exec } from "child_process";
-import path from "path";
-import readline from "readline";
+import path = require("path");
+import readline = require("readline");
 import { promisify } from "util";
 import { TenancyConfig } from "./types";
 
 const execAsync = promisify(exec);
+
+function quoteShellArg(value: string): string {
+  return `'${value.replace(/'/g, "'\\''")}'`;
+}
 
 export class TenancyCli {
   constructor(
@@ -37,7 +41,7 @@ export class TenancyCli {
   async initConfig(): Promise<void> {
     console.log("Attempting to copy over the tenants config folder to root.");
     await this.executeCommand(
-      `cp -r node_modules/node-multi-tenant/tenants ${this.cwd}/`,
+      `cp -r node_modules/node-multi-tenant/tenants ${quoteShellArg(`${this.cwd}/`)}`,
     );
     console.log("Tenancy config folder copied successfully");
   }
@@ -51,23 +55,24 @@ export class TenancyCli {
       this.cwd,
       this.config.datastore.migrationsfolder,
     );
+    const tenantMigrationPath = path.join(migrationPath, "tenants");
 
     console.log("Starting Tenancy Installation");
-    await this.executeCommand(`mkdir -p ${migrationPath}/tenants`);
+    await this.executeCommand(`mkdir -p ${quoteShellArg(tenantMigrationPath)}`);
     await this.executeCommand(
-      `mv ${migrationPath}/*.js ${migrationPath}/tenants`,
+      `mv ${quoteShellArg(migrationPath)}/*.js ${quoteShellArg(tenantMigrationPath)}`,
     );
     await this.executeCommand(
-      `cp node_modules/node-multi-tenant/dist/migrations/*.js ${migrationPath}/`,
+      `cp node_modules/node-multi-tenant/dist/migrations/*.js ${quoteShellArg(`${migrationPath}/`)}`,
     );
     await this.executeCommand(
-      `cp node_modules/node-multi-tenant/dist/models/*.js ${modelsPath}/`,
+      `cp node_modules/node-multi-tenant/dist/models/*.js ${quoteShellArg(`${modelsPath}/`)}`,
     );
     await this.executeCommand("node_modules/.bin/sequelize db:drop");
     await this.executeCommand("node_modules/.bin/sequelize db:create");
     await this.executeCommand("node_modules/.bin/sequelize db:migrate");
     await this.executeCommand(
-      `node_modules/.bin/sequelize db:migrate --migrations-path=${migrationPath}/tenants`,
+      `node_modules/.bin/sequelize db:migrate --migrations-path=${quoteShellArg(tenantMigrationPath)}`,
     );
     await this.executeCommand("node_modules/.bin/sequelize db:seed:all");
     console.log("Tenancy Installation Completed Successfully");

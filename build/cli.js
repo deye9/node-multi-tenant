@@ -1,14 +1,14 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TenancyCli = void 0;
 const child_process_1 = require("child_process");
-const path_1 = __importDefault(require("path"));
-const readline_1 = __importDefault(require("readline"));
+const path = require("path");
+const readline = require("readline");
 const util_1 = require("util");
 const execAsync = (0, util_1.promisify)(child_process_1.exec);
+function quoteShellArg(value) {
+    return `'${value.replace(/'/g, "'\\''")}'`;
+}
 class TenancyCli {
     constructor(config, cwd = process.cwd()) {
         this.config = config;
@@ -34,27 +34,28 @@ class TenancyCli {
     }
     async initConfig() {
         console.log("Attempting to copy over the tenants config folder to root.");
-        await this.executeCommand(`cp -r node_modules/node-multi-tenant/tenants ${this.cwd}/`);
+        await this.executeCommand(`cp -r node_modules/node-multi-tenant/tenants ${quoteShellArg(`${this.cwd}/`)}`);
         console.log("Tenancy config folder copied successfully");
     }
     async install() {
-        const modelsPath = path_1.default.resolve(this.cwd, this.config.datastore.modelsfolder);
-        const migrationPath = path_1.default.resolve(this.cwd, this.config.datastore.migrationsfolder);
+        const modelsPath = path.resolve(this.cwd, this.config.datastore.modelsfolder);
+        const migrationPath = path.resolve(this.cwd, this.config.datastore.migrationsfolder);
+        const tenantMigrationPath = path.join(migrationPath, "tenants");
         console.log("Starting Tenancy Installation");
-        await this.executeCommand(`mkdir -p ${migrationPath}/tenants`);
-        await this.executeCommand(`mv ${migrationPath}/*.js ${migrationPath}/tenants`);
-        await this.executeCommand(`cp node_modules/node-multi-tenant/dist/migrations/*.js ${migrationPath}/`);
-        await this.executeCommand(`cp node_modules/node-multi-tenant/dist/models/*.js ${modelsPath}/`);
+        await this.executeCommand(`mkdir -p ${quoteShellArg(tenantMigrationPath)}`);
+        await this.executeCommand(`mv ${quoteShellArg(migrationPath)}/*.js ${quoteShellArg(tenantMigrationPath)}`);
+        await this.executeCommand(`cp node_modules/node-multi-tenant/dist/migrations/*.js ${quoteShellArg(`${migrationPath}/`)}`);
+        await this.executeCommand(`cp node_modules/node-multi-tenant/dist/models/*.js ${quoteShellArg(`${modelsPath}/`)}`);
         await this.executeCommand("node_modules/.bin/sequelize db:drop");
         await this.executeCommand("node_modules/.bin/sequelize db:create");
         await this.executeCommand("node_modules/.bin/sequelize db:migrate");
-        await this.executeCommand(`node_modules/.bin/sequelize db:migrate --migrations-path=${migrationPath}/tenants`);
+        await this.executeCommand(`node_modules/.bin/sequelize db:migrate --migrations-path=${quoteShellArg(tenantMigrationPath)}`);
         await this.executeCommand("node_modules/.bin/sequelize db:seed:all");
         console.log("Tenancy Installation Completed Successfully");
     }
     startInteractive() {
         console.log("\x1b[34m%s\x1b[0m", "The CLI is running");
-        const cliInterface = readline_1.default.createInterface({
+        const cliInterface = readline.createInterface({
             input: process.stdin,
             output: process.stdout,
             prompt: ">",

@@ -1,4 +1,4 @@
-import path from "path";
+import path = require("path");
 import Sequelize = require("sequelize");
 import { ConfigLoader } from "./config";
 import { buildConnectionString } from "./connectionString";

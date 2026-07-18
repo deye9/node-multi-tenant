@@ -24,7 +24,7 @@ export interface DbContext {
 export interface TenantRecord extends Dictionary {
   id?: number;
   uuid: string;
-  fqdn: string;
+  fqdn?: string;
 }
 
 export interface TenantInitOptions {

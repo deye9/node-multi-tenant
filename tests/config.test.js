@@ -37,7 +37,7 @@ describe('ConfigLoader', () => {
   it('uses the built-in test config when NODE_ENV is test', () => {
     process.env.NODE_ENV = 'test';
 
-    const result = new ConfigLoader('/missing/project').readConfig();
+    const result = new ConfigLoader().readConfig();
 
     expect(result.datastore.modelsfolder).to.equal('tests/database/models');
     expect(result['models-shared']).to.deep.equal({

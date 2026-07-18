@@ -75,12 +75,15 @@ export class TenantRepository {
     );
   }
 
-  async findById(modelName: string, pk: number): Promise<Dictionary> {
+  async findById(
+    modelName: string,
+    pk: number,
+  ): Promise<Dictionary | undefined> {
     return this.capture(
       `Failed retrieving record from the database for Primary Key ${pk}`,
       async () => {
         const result = await this.collection(modelName).findByPk(pk);
-        return result.dataValues;
+        return result?.dataValues;
       },
     );
   }
@@ -103,7 +106,7 @@ export class TenantRepository {
         const result = await this.collection(modelName).findOne({
           where: keyValue,
         });
-        return result.dataValues;
+        return result?.dataValues;
       },
     );
   }

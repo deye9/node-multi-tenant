@@ -1,11 +1,8 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TenantService = void 0;
 const events_1 = require("events");
-const path_1 = __importDefault(require("path"));
+const path = require("path");
 const config_1 = require("./config");
 const connectionString_1 = require("./connectionString");
 const contextRegistry_1 = require("./contextRegistry");
@@ -28,6 +25,22 @@ class TenantService {
         }
     }
     async init() {
+        if (this.initialized) {
+            return;
+        }
+        if (this.initialization) {
+            return this.initialization;
+        }
+        this.initialization = this.initialize();
+        try {
+            await this.initialization;
+        }
+        catch (error) {
+            this.initialization = undefined;
+            throw error;
+        }
+    }
+    async initialize() {
         if (this.initialized) {
             return;
         }
@@ -176,8 +189,8 @@ class TenantService {
     async createTenantDatabase(uuid) {
         const defaultSequelize = this.registry.defaultContext.sequelize;
         const connectionString = (0, connectionString_1.buildConnectionString)(defaultSequelize, uuid);
-        const migrationPath = path_1.default.resolve(this.cwd, this.config.datastore.migrationsfolder);
-        const seedersPath = path_1.default.resolve(this.cwd, this.config.datastore.seedersfolder);
+        const migrationPath = path.resolve(this.cwd, this.config.datastore.migrationsfolder);
+        const seedersPath = path.resolve(this.cwd, this.config.datastore.seedersfolder);
         await this.cli.executeCommand(`node_modules/.bin/sequelize db:create --url ${connectionString}`);
         this.cli.logger("Performing Migrations");
         await this.cli.executeCommand(`node_modules/.bin/sequelize db:migrate --url ${connectionString} --migrations-path=${migrationPath}/tenants`);

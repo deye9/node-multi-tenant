@@ -9,8 +9,10 @@ export declare class TenantService {
     private readonly cli;
     private currentTenantId;
     private initialized;
+    private initialization?;
     constructor(options?: TenantInitOptions);
     init(): Promise<void>;
+    private initialize;
     setCurrentTenant(hostname?: string): Promise<void>;
     createTenant(fqdn: string): Promise<Dictionary>;
     deleteTenant(fqdn: string): Promise<number>;

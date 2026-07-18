@@ -9,7 +9,7 @@ export declare class TenantRepository {
     truncate(modelName: string): Promise<number>;
     update(modelName: string, key: Dictionary, dataObject: Dictionary): Promise<any>;
     getAll(modelName: string): Promise<any[]>;
-    findById(modelName: string, pk: number): Promise<Dictionary>;
+    findById(modelName: string, pk: number): Promise<Dictionary | undefined>;
     findAll(modelName: string, keyValue?: Dictionary): Promise<any[]>;
     findOne(modelName: string, keyValue: Dictionary): Promise<Dictionary>;
     execute(sqlCommand: string): Promise<any[]>;

@@ -55,15 +55,37 @@ describe('TenancyCli', () => {
       'node_modules/.bin/sequelize db:seed:undo:all',
       'node_modules/.bin/sequelize db:migrate:undo',
       'node_modules/.bin/sequelize db:migrate',
-      'cp -r node_modules/node-multi-tenant/tenants /app/',
-      'mkdir -p /app/database/migrations/tenants',
-      'mv /app/database/migrations/*.js /app/database/migrations/tenants',
-      'cp node_modules/node-multi-tenant/dist/migrations/*.js /app/database/migrations/',
-      'cp node_modules/node-multi-tenant/dist/models/*.js /app/database/models/',
+      "cp -r node_modules/node-multi-tenant/tenants '/app/'",
+      "mkdir -p '/app/database/migrations/tenants'",
+      "mv '/app/database/migrations'/*.js '/app/database/migrations/tenants'",
+      "cp node_modules/node-multi-tenant/dist/migrations/*.js '/app/database/migrations/'",
+      "cp node_modules/node-multi-tenant/dist/models/*.js '/app/database/models/'",
       'node_modules/.bin/sequelize db:drop',
       'node_modules/.bin/sequelize db:create',
       'node_modules/.bin/sequelize db:migrate',
-      'node_modules/.bin/sequelize db:migrate --migrations-path=/app/database/migrations/tenants',
+      "node_modules/.bin/sequelize db:migrate --migrations-path='/app/database/migrations/tenants'",
+      'node_modules/.bin/sequelize db:seed:all',
+    ]);
+  });
+
+  it('quotes cwd-derived shell paths during init and install', async () => {
+    const cli = new TenancyCli(config, "/tmp/app root/tenant's project; rm -rf nope");
+    const executeCommand = sinon.stub(cli, 'executeCommand').resolves(true);
+    sinon.stub(console, 'log');
+
+    await cli.initConfig();
+    await cli.install();
+
+    expect(executeCommand.args.map(([command]) => command)).to.deep.equal([
+      "cp -r node_modules/node-multi-tenant/tenants '/tmp/app root/tenant'\\''s project; rm -rf nope/'",
+      "mkdir -p '/tmp/app root/tenant'\\''s project; rm -rf nope/database/migrations/tenants'",
+      "mv '/tmp/app root/tenant'\\''s project; rm -rf nope/database/migrations'/*.js '/tmp/app root/tenant'\\''s project; rm -rf nope/database/migrations/tenants'",
+      "cp node_modules/node-multi-tenant/dist/migrations/*.js '/tmp/app root/tenant'\\''s project; rm -rf nope/database/migrations/'",
+      "cp node_modules/node-multi-tenant/dist/models/*.js '/tmp/app root/tenant'\\''s project; rm -rf nope/database/models/'",
+      'node_modules/.bin/sequelize db:drop',
+      'node_modules/.bin/sequelize db:create',
+      'node_modules/.bin/sequelize db:migrate',
+      "node_modules/.bin/sequelize db:migrate --migrations-path='/tmp/app root/tenant'\\''s project; rm -rf nope/database/migrations/tenants'",
       'node_modules/.bin/sequelize db:seed:all',
     ]);
   });

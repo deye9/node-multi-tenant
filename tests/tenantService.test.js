@@ -90,6 +90,55 @@ describe('TenantService', () => {
     expect(service.currentTenantId).to.equal('tenant-1');
   });
 
+  it('shares in-flight initialization work across concurrent callers', async () => {
+    const { service, eventEmitter, registry } = createService();
+    let finishInitialization;
+    registry.initialize.callsFake(() => new Promise((resolve) => {
+      finishInitialization = resolve;
+    }));
+
+    const first = service.init();
+    const second = service.init();
+
+    expect(registry.initialize.calledOnce).to.equal(true);
+    expect(eventEmitter.listenerCount('requestUrl')).to.equal(0);
+
+    finishInitialization();
+    await Promise.all([first, second]);
+    await service.init();
+
+    expect(registry.initialize.calledOnce).to.equal(true);
+    expect(eventEmitter.listenerCount('requestUrl')).to.equal(1);
+  });
+
+  it('clears failed in-flight initialization so a later call can retry', async () => {
+    const { service, eventEmitter, registry } = createService();
+    registry.initialize.onFirstCall().rejects(new Error('initialization failed'));
+    registry.initialize.onSecondCall().resolves();
+
+    try {
+      await service.init();
+      throw new Error('Expected service.init to fail');
+    } catch (error) {
+      expect(error.message).to.equal('initialization failed');
+    }
+
+    await service.init();
+
+    expect(registry.initialize.calledTwice).to.equal(true);
+    expect(eventEmitter.listenerCount('requestUrl')).to.equal(1);
+  });
+
+  it('sets the default tenant during initialization when a default hostname is configured', async () => {
+    const { service } = createService();
+    process.env.TENANCY_DEFAULT_HOSTNAME = 'DEFAULT.EXAMPLE.COM';
+    service.currentTenantId = 'tenant-9';
+
+    await service.init();
+
+    expect(service.currentTenantId).to.equal('default');
+  });
+
   it('logs requestUrl tenant resolution failures without rejecting the event handler', async () => {
     const { service, eventEmitter, registry, cli } = createService();
     registry.resolveHostname.rejects(new Error('lookup failed'));

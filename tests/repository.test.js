@@ -223,6 +223,29 @@ describe('TenantRepository', () => {
     });
   });
 
+  it('updates audit records from model instances when Sequelize returns instances', async () => {
+    process.env.TENANCY_AUDIT_LOG = 'true';
+    const oldRecord = { dataValues: { id: 6, name: 'Old' } };
+    const updatedRecord = { dataValues: { id: 6, name: 'New' } };
+    const model = {
+      findOne: sinon.stub().resolves(oldRecord),
+      update: sinon.stub().resolves(updatedRecord),
+    };
+    const auditModel = { create: sinon.stub().resolves({}) };
+    const { repository } = createRepository(model, 'tenant-1', auditModel);
+
+    await repository.update('user', { id: 6 }, updatedRecord);
+
+    expect(auditModel.create.firstCall.args[0]).to.include({
+      event: 'Update',
+      model: 'user',
+      record_id: 6,
+    });
+    expect(auditModel.create.firstCall.args[0].new_values).to.equal(
+      JSON.stringify(updatedRecord.dataValues),
+    );
+  });
+
   it('finds by primary key and unwraps dataValues', async () => {
     const model = {
       findByPk: sinon.stub().resolves({ dataValues: { id: 4, name: 'Ada' } }),
@@ -233,6 +256,18 @@ describe('TenantRepository', () => {
 
     expect(result).to.deep.equal({ id: 4, name: 'Ada' });
     expect(model.findByPk.calledOnceWithExactly(4)).to.equal(true);
+  });
+
+  it('returns undefined when a primary key lookup does not find a record', async () => {
+    const model = {
+      findByPk: sinon.stub().resolves(null),
+    };
+    const { repository } = createRepository(model);
+
+    const result = await repository.findById('user', 404);
+
+    expect(result).to.equal(undefined);
+    expect(model.findByPk.calledOnceWithExactly(404)).to.equal(true);
   });
 
   it('finds one record and unwraps dataValues', async () => {

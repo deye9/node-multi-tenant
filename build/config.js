@@ -1,11 +1,8 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConfigLoader = void 0;
-const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
+const fs = require("fs");
+const path = require("path");
 const testConfig = {
     datastore: {
         modelsfolder: "tests/database/models",
@@ -31,17 +28,17 @@ class ConfigLoader {
         return this.readProjectConfig();
     }
     requireFromProject(filename) {
-        return require(path_1.default.resolve(this.cwd, filename));
+        return require(path.resolve(this.cwd, filename));
     }
     readProjectConfig() {
-        const typescriptConfigPath = path_1.default.resolve(this.cwd, "tenants/tenancy.ts");
-        if (fs_1.default.existsSync(typescriptConfigPath)) {
+        const typescriptConfigPath = path.resolve(this.cwd, "tenants/tenancy.ts");
+        if (fs.existsSync(typescriptConfigPath)) {
             return this.requireTypeScriptConfig(typescriptConfigPath);
         }
         return this.requireFromProject("tenants/tenancy.js");
     }
     requireTypeScriptConfig(filePath) {
-        const source = fs_1.default.readFileSync(filePath, "utf8");
+        const source = fs.readFileSync(filePath, "utf8");
         const compiledSource = source
             .replace(/^import\s+type\s+[^;]+;\s*$/gm, "")
             .replace(/const\s+config\s*:\s*TenancyConfig\s*=/, "const config =")
@@ -53,7 +50,7 @@ class ConfigLoader {
         return configModule.exports;
     }
     async getTenantModelFiles(modelsFolder, sharedModels) {
-        const files = await fs_1.default.promises.readdir(path_1.default.resolve(this.cwd, modelsFolder));
+        const files = await fs.promises.readdir(path.resolve(this.cwd, modelsFolder));
         const excludedFiles = new Set([...Object.values(sharedModels), "index.js"]);
         return files.filter((file) => file.endsWith(".js") && !excludedFiles.has(file));
     }

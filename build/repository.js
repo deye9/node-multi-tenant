@@ -53,7 +53,7 @@ class TenantRepository {
     async findById(modelName, pk) {
         return this.capture(`Failed retrieving record from the database for Primary Key ${pk}`, async () => {
             const result = await this.collection(modelName).findByPk(pk);
-            return result.dataValues;
+            return result === null || result === void 0 ? void 0 : result.dataValues;
         });
     }
     async findAll(modelName, keyValue) {
@@ -67,7 +67,7 @@ class TenantRepository {
             const result = await this.collection(modelName).findOne({
                 where: keyValue,
             });
-            return result.dataValues;
+            return result === null || result === void 0 ? void 0 : result.dataValues;
         });
     }
     async execute(sqlCommand) {

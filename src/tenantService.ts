@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import path from "path";
+import path = require("path");
 import { ConfigLoader } from "./config";
 import { buildConnectionString } from "./connectionString";
 import { TenantContextRegistry } from "./contextRegistry";
@@ -17,6 +17,7 @@ export class TenantService {
   private readonly cli: TenancyCli;
   private currentTenantId = "default";
   private initialized = false;
+  private initialization?: Promise<void>;
 
   constructor(options: TenantInitOptions = {}) {
     this.cwd = options.cwd || process.cwd();
@@ -42,6 +43,25 @@ export class TenantService {
   }
 
   async init(): Promise<void> {
+    if (this.initialized) {
+      return;
+    }
+
+    if (this.initialization) {
+      return this.initialization;
+    }
+
+    this.initialization = this.initialize();
+
+    try {
+      await this.initialization;
+    } catch (error) {
+      this.initialization = undefined;
+      throw error;
+    }
+  }
+
+  private async initialize(): Promise<void> {
     if (this.initialized) {
       return;
     }

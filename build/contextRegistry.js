@@ -1,10 +1,7 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TenantContextRegistry = void 0;
-const path_1 = __importDefault(require("path"));
+const path = require("path");
 const Sequelize = require("sequelize");
 const connectionString_1 = require("./connectionString");
 const SequelizeConstructor = Sequelize;
@@ -86,7 +83,7 @@ class TenantContextRegistry {
         const context = { sequelize, Sequelize };
         const modelFiles = Array.isArray(models) ? models : Object.values(models);
         modelFiles.forEach((filename) => {
-            const modelPath = path_1.default.resolve(this.cwd, this.config.datastore.modelsfolder, filename);
+            const modelPath = path.resolve(this.cwd, this.config.datastore.modelsfolder, filename);
             const modelFactory = require(modelPath);
             const model = modelFactory(sequelize, Sequelize);
             context[model.name] = model;
