@@ -1,5 +1,6 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
+const readline = require('readline');
 
 const { TenancyCli } = require('../build/cli');
 
@@ -26,10 +27,12 @@ describe('TenancyCli', () => {
 
     await cli.processInput('tenancy:db:seed');
     await cli.processInput('tenancy:migrate');
+    await cli.processInput('tenancy:migrate --tenant-1');
     await cli.processInput('tenancy:db:unseed --recent');
 
     expect(executeCommand.args.map(([command]) => command)).to.deep.equal([
       'node_modules/.bin/sequelize db:seed:all',
+      'node_modules/.bin/sequelize db:migrate',
       'node_modules/.bin/sequelize db:migrate',
       'node_modules/.bin/sequelize db:seed:undo',
     ]);
@@ -87,11 +90,44 @@ describe('TenancyCli', () => {
     expect(log.callCount).to.be.greaterThan(2);
   });
 
+  it('allows Sequelize deprecation warnings on stderr', async () => {
+    const cli = new TenancyCli(config, process.cwd());
+    const log = sinon.stub(console, 'log');
+
+    const result = await cli.executeCommand(
+      'node -e "console.error(\'sequelize deprecated string based operators are now deprecated\')"',
+    );
+
+    expect(result).to.equal(true);
+    expect(log.firstCall.args[1]).to.equal('stdout: ');
+  });
+
+  it('wires interactive input through processInput and re-prompts', async () => {
+    const cli = new TenancyCli(config, process.cwd());
+    const processInput = sinon.stub(cli, 'processInput').resolves();
+    const prompt = sinon.stub();
+    let lineHandler;
+    sinon.stub(readline, 'createInterface').returns({
+      prompt,
+      on(eventName, handler) {
+        lineHandler = handler;
+      },
+    });
+    sinon.stub(console, 'log');
+
+    cli.startInteractive();
+    await lineHandler('help');
+
+    expect(processInput.calledOnceWithExactly('help')).to.equal(true);
+    expect(prompt.calledTwice).to.equal(true);
+  });
+
   it('prints help that points users at tenants/tenancy.ts', async () => {
     const cli = new TenancyCli(config, process.cwd());
     const log = sinon.stub(console, 'log');
 
     await cli.processInput('help');
+    await cli.processInput('man');
 
     const output = log.args.map((args) => args.join(' ')).join('\n');
     expect(output).to.include('tenants/tenancy.ts');

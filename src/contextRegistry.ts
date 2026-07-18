@@ -52,17 +52,18 @@ export class TenantContextRegistry {
       },
     )) as TenantRecord[];
 
-    await Promise.all(
-      tenants.map(async (tenant) => {
-        if (tenant.fqdn) {
-          this.hostnames.set(tenant.fqdn.toLowerCase(), tenant.uuid);
-        }
-        await this.attachTenantContext(tenant.uuid);
-      }),
-    );
+    tenants.forEach((tenant) => {
+      if (tenant.fqdn) {
+        this.hostnames.set(tenant.fqdn.toLowerCase(), tenant.uuid);
+      }
+    });
   }
 
   async attachTenantContext(uuid: string): Promise<void> {
+    if (this.contexts.has(uuid)) {
+      return;
+    }
+
     const defaultSequelize = this.defaultContext.sequelize;
     const tenantModelFiles = await this.configLoader.getTenantModelFiles(
       this.config.datastore.modelsfolder,

@@ -33,14 +33,16 @@ class TenantContextRegistry {
         const tenants = (await this.defaultContext.sequelize.query("select uuid, fqdn from hostnames", {
             type: Sequelize.QueryTypes.SELECT,
         }));
-        await Promise.all(tenants.map(async (tenant) => {
+        tenants.forEach((tenant) => {
             if (tenant.fqdn) {
                 this.hostnames.set(tenant.fqdn.toLowerCase(), tenant.uuid);
             }
-            await this.attachTenantContext(tenant.uuid);
-        }));
+        });
     }
     async attachTenantContext(uuid) {
+        if (this.contexts.has(uuid)) {
+            return;
+        }
         const defaultSequelize = this.defaultContext.sequelize;
         const tenantModelFiles = await this.configLoader.getTenantModelFiles(this.config.datastore.modelsfolder, this.config["models-shared"]);
         await this.attachContext(tenantModelFiles, (0, connectionString_1.buildConnectionString)(defaultSequelize, uuid), uuid);

@@ -77,22 +77,33 @@ export class TenantService {
 
     const cached = this.registry.resolveCachedHostname(hostname);
     if (cached) {
+      await this.registry.attachTenantContext(cached);
       this.currentTenantId = cached;
       return;
     }
 
     const uuid = await this.registry.resolveHostname(hostname);
     if (uuid) {
+      await this.registry.attachTenantContext(uuid);
       this.currentTenantId = uuid;
     }
   }
 
   async createTenant(fqdn: string): Promise<Dictionary> {
     await this.ensureInitialized();
-    const result = await this.repository.add("hostname", {
-      fqdn,
-      force_https: true,
-    });
+    const previousTenantId = this.currentTenantId;
+    this.currentTenantId = "default";
+
+    let result: any;
+    try {
+      result = await this.repository.add("hostname", {
+        fqdn,
+        force_https: true,
+      });
+    } finally {
+      this.currentTenantId = previousTenantId;
+    }
+
     await this.createTenantDatabase(result.uuid);
     this.registry.rememberHostname(fqdn, result.uuid);
     return {
@@ -105,9 +116,8 @@ export class TenantService {
   async deleteTenant(fqdn: string): Promise<number> {
     await this.ensureInitialized();
     const tenant = await this.tenantDbUUID(fqdn);
-    const tenantContext = this.registry.getContext(tenant.uuid);
     const connectionString = buildConnectionString(
-      tenantContext.sequelize,
+      this.registry.defaultContext.sequelize,
       tenant.uuid,
     );
 
@@ -124,23 +134,37 @@ export class TenantService {
 
   async tenantExists(fqdn: string): Promise<Dictionary> {
     await this.ensureInitialized();
-    return this.repository.findOne("hostname", { fqdn });
+    const previousTenantId = this.currentTenantId;
+    this.currentTenantId = "default";
+
+    try {
+      return this.repository.findOne("hostname", { fqdn });
+    } finally {
+      this.currentTenantId = previousTenantId;
+    }
   }
 
   async updateTenant(fqdn: string, dataObject: Dictionary): Promise<any> {
     await this.ensureInitialized();
-    const tenantDetails = await this.tenantExists(fqdn);
-    Object.keys(dataObject).forEach((key) => {
-      if (!["id", "fqdn", "uuid", "createdAt", "deletedAt"].includes(key)) {
-        tenantDetails[key] = dataObject[key];
-      }
-    });
+    const previousTenantId = this.currentTenantId;
+    this.currentTenantId = "default";
 
-    return this.repository.update(
-      "hostname",
-      { id: tenantDetails.id },
-      tenantDetails,
-    );
+    try {
+      const tenantDetails = await this.tenantExists(fqdn);
+      Object.keys(dataObject).forEach((key) => {
+        if (!["id", "fqdn", "uuid", "createdAt", "deletedAt"].includes(key)) {
+          tenantDetails[key] = dataObject[key];
+        }
+      });
+
+      return this.repository.update(
+        "hostname",
+        { id: tenantDetails.id },
+        tenantDetails,
+      );
+    } finally {
+      this.currentTenantId = previousTenantId;
+    }
   }
 
   async getTenantConnectionString(): Promise<string> {

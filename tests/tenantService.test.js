@@ -82,11 +82,23 @@ describe('TenantService', () => {
     await service.init();
     await service.init();
     eventEmitter.emit('requestUrl', 'tenant.example.com');
-    await Promise.resolve();
+    await new Promise((resolve) => setImmediate(resolve));
 
     expect(registry.initialize.calledOnce).to.equal(true);
     expect(registry.resolveHostname.calledWith('tenant.example.com')).to.equal(true);
+    expect(registry.attachTenantContext.calledOnceWithExactly('tenant-1')).to.equal(true);
     expect(service.currentTenantId).to.equal('tenant-1');
+  });
+
+  it('logs requestUrl tenant resolution failures without rejecting the event handler', async () => {
+    const { service, eventEmitter, registry, cli } = createService();
+    registry.resolveHostname.rejects(new Error('lookup failed'));
+
+    await service.init();
+    eventEmitter.emit('requestUrl', 'tenant.example.com');
+    await new Promise((resolve) => setImmediate(resolve));
+
+    expect(cli.logger.calledOnceWithExactly('lookup failed', '\x1b[31m%s\x1b[0m')).to.equal(true);
   });
 
   it('honors the configured default hostname and cached tenant hostnames', async () => {
@@ -100,10 +112,19 @@ describe('TenantService', () => {
 
     await service.setCurrentTenant('cached.example.com');
     expect(service.currentTenantId).to.equal('tenant-2');
+    expect(registry.attachTenantContext.calledOnceWithExactly('tenant-2')).to.equal(true);
+
+    await service.setCurrentTenant('missing.example.com');
+    expect(service.currentTenantId).to.equal('tenant-2');
   });
 
   it('creates a tenant, provisions its database, and caches the hostname', async () => {
     const { service, registry, repository, cli } = createService();
+    service.currentTenantId = 'tenant-9';
+    repository.add.callsFake(async () => {
+      expect(service.currentTenantId).to.equal('default');
+      return { id: 9, uuid: 'tenant-1' };
+    });
 
     const result = await service.createTenant('tenant.example.com');
 
@@ -114,6 +135,7 @@ describe('TenantService', () => {
     expect(cli.executeCommand.callCount).to.equal(3);
     expect(registry.attachTenantContext.calledOnceWithExactly('tenant-1')).to.equal(true);
     expect(registry.rememberHostname.calledOnceWithExactly('tenant.example.com', 'tenant-1')).to.equal(true);
+    expect(service.currentTenantId).to.equal('tenant-9');
     expect(result).to.deep.equal({
       website_id: 9,
       uuid: 'tenant-1',
@@ -136,13 +158,36 @@ describe('TenantService', () => {
     expect(service.currentTenantId).to.equal('default');
   });
 
+  it('looks up tenant hostnames from the default context while preserving the active tenant', async () => {
+    const { service, repository } = createService();
+    service.currentTenantId = 'tenant-9';
+    repository.findOne.callsFake(async () => {
+      expect(service.currentTenantId).to.equal('default');
+      return { id: 9, uuid: 'tenant-1', fqdn: 'tenant.example.com' };
+    });
+
+    const result = await service.tenantExists('tenant.example.com');
+
+    expect(repository.findOne.calledOnceWithExactly('hostname', { fqdn: 'tenant.example.com' })).to.equal(true);
+    expect(service.currentTenantId).to.equal('tenant-9');
+    expect(result).to.deep.equal({ id: 9, uuid: 'tenant-1', fqdn: 'tenant.example.com' });
+  });
+
   it('updates tenant fields without changing protected identity fields', async () => {
     const { service, repository } = createService();
-    repository.findOne.resolves({
-      id: 2,
-      fqdn: 'tenant.example.com',
-      uuid: 'tenant-1',
-      plan: 'basic',
+    service.currentTenantId = 'tenant-9';
+    repository.findOne.callsFake(async () => {
+      expect(service.currentTenantId).to.equal('default');
+      return {
+        id: 2,
+        fqdn: 'tenant.example.com',
+        uuid: 'tenant-1',
+        plan: 'basic',
+      };
+    });
+    repository.update.callsFake(async () => {
+      expect(service.currentTenantId).to.equal('default');
+      return [1];
     });
 
     await service.updateTenant('tenant.example.com', {
@@ -163,6 +208,7 @@ describe('TenantService', () => {
         plan: 'pro',
       },
     ]);
+    expect(service.currentTenantId).to.equal('tenant-9');
   });
 
   it('delegates data operations to the repository after initialization', async () => {

@@ -89,6 +89,39 @@ describe('TenantRepository', () => {
     }
   });
 
+  it('captures non-Error repository failures as strings', async () => {
+    const model = { findAll: sinon.stub().rejects('database unavailable') };
+    const { repository } = createRepository(model);
+
+    try {
+      await repository.findAll('user');
+      throw new Error('Expected repository.findAll to fail');
+    } catch (error) {
+      expect(error).to.be.instanceOf(RepositoryError);
+      expect(error['Error Message']).to.equal('database unavailable');
+    }
+  });
+
+  it('uses the updated key when auditing updates that return plain records', async () => {
+    process.env.TENANCY_AUDIT_LOG = 'true';
+    const oldRecord = { dataValues: { id: 3, name: 'Old' } };
+    const updatedRecord = { name: 'New' };
+    const model = {
+      findOne: sinon.stub().resolves(oldRecord),
+      update: sinon.stub().resolves(updatedRecord),
+    };
+    const auditModel = { create: sinon.stub().resolves({}) };
+    const { repository } = createRepository(model, 'tenant-1', auditModel);
+
+    await repository.update('user', { id: 3 }, updatedRecord);
+
+    expect(auditModel.create.firstCall.args[0]).to.include({
+      event: 'Update',
+      model: 'user',
+      record_id: 3,
+    });
+  });
+
   it('writes audit records for tenant mutations when enabled', async () => {
     process.env.TENANCY_AUDIT_LOG = 'true';
     const created = { dataValues: { id: 7, name: 'Ada' } };

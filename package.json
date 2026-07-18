@@ -1,6 +1,6 @@
 {
   "name": "node-multi-tenant",
-  "version": "1.0.8",
+  "version": "2.0.0",
   "description": "Multi-tenant Node.js Application",
   "main": "build/main.js",
   "types": "build/main.d.ts",
@@ -17,8 +17,8 @@
     "start": "node build/main.js",
     "test-watch": "npm run build && mocha \"tests/**/*.test.js\" --watch",
     "eslint": "eslint **/*.js --fix --quiet",
-    "coverage": "npm run build && nyc --reporter=html --reporter=text mocha \"tests/**/*.test.js\" --exit",
-    "test": "npm run build && nyc --reporter=text mocha \"tests/**/*.test.js\" --exit"
+    "coverage": "npm run build && nyc --check-coverage --statements 95 --branches 95 --functions 95 --lines 95 --reporter=html --reporter=text mocha \"tests/**/*.test.js\" --exit",
+    "test": "npm run build && nyc --check-coverage --statements 95 --branches 95 --functions 95 --lines 95 --reporter=text mocha \"tests/**/*.test.js\" --exit"
   },
   "repository": {
     "type": "git",

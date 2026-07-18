@@ -52,20 +52,30 @@ class TenantService {
         }
         const cached = this.registry.resolveCachedHostname(hostname);
         if (cached) {
+            await this.registry.attachTenantContext(cached);
             this.currentTenantId = cached;
             return;
         }
         const uuid = await this.registry.resolveHostname(hostname);
         if (uuid) {
+            await this.registry.attachTenantContext(uuid);
             this.currentTenantId = uuid;
         }
     }
     async createTenant(fqdn) {
         await this.ensureInitialized();
-        const result = await this.repository.add("hostname", {
-            fqdn,
-            force_https: true,
-        });
+        const previousTenantId = this.currentTenantId;
+        this.currentTenantId = "default";
+        let result;
+        try {
+            result = await this.repository.add("hostname", {
+                fqdn,
+                force_https: true,
+            });
+        }
+        finally {
+            this.currentTenantId = previousTenantId;
+        }
         await this.createTenantDatabase(result.uuid);
         this.registry.rememberHostname(fqdn, result.uuid);
         return {
@@ -77,8 +87,7 @@ class TenantService {
     async deleteTenant(fqdn) {
         await this.ensureInitialized();
         const tenant = await this.tenantDbUUID(fqdn);
-        const tenantContext = this.registry.getContext(tenant.uuid);
-        const connectionString = (0, connectionString_1.buildConnectionString)(tenantContext.sequelize, tenant.uuid);
+        const connectionString = (0, connectionString_1.buildConnectionString)(this.registry.defaultContext.sequelize, tenant.uuid);
         this.currentTenantId = "default";
         const result = await this.repository.remove("hostname", { fqdn });
         await this.registry.closeAndRemove(tenant.uuid);
@@ -89,17 +98,31 @@ class TenantService {
     }
     async tenantExists(fqdn) {
         await this.ensureInitialized();
-        return this.repository.findOne("hostname", { fqdn });
+        const previousTenantId = this.currentTenantId;
+        this.currentTenantId = "default";
+        try {
+            return this.repository.findOne("hostname", { fqdn });
+        }
+        finally {
+            this.currentTenantId = previousTenantId;
+        }
     }
     async updateTenant(fqdn, dataObject) {
         await this.ensureInitialized();
-        const tenantDetails = await this.tenantExists(fqdn);
-        Object.keys(dataObject).forEach((key) => {
-            if (!["id", "fqdn", "uuid", "createdAt", "deletedAt"].includes(key)) {
-                tenantDetails[key] = dataObject[key];
-            }
-        });
-        return this.repository.update("hostname", { id: tenantDetails.id }, tenantDetails);
+        const previousTenantId = this.currentTenantId;
+        this.currentTenantId = "default";
+        try {
+            const tenantDetails = await this.tenantExists(fqdn);
+            Object.keys(dataObject).forEach((key) => {
+                if (!["id", "fqdn", "uuid", "createdAt", "deletedAt"].includes(key)) {
+                    tenantDetails[key] = dataObject[key];
+                }
+            });
+            return this.repository.update("hostname", { id: tenantDetails.id }, tenantDetails);
+        }
+        finally {
+            this.currentTenantId = previousTenantId;
+        }
     }
     async getTenantConnectionString() {
         await this.ensureInitialized();

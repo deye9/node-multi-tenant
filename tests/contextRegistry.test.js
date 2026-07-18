@@ -87,6 +87,18 @@ describe('TenantContextRegistry', () => {
     );
   });
 
+  it('returns cached hostnames without querying the database', async () => {
+    const registry = new TenantContextRegistry(config, {}, process.cwd());
+    const query = sinon.stub().resolves([{ uuid: 'tenant-2' }]);
+    registry.contexts.set('default', { sequelize: { query } });
+    registry.rememberHostname('tenant.example.com', 'tenant-1');
+
+    const result = await registry.resolveHostname('tenant.example.com');
+
+    expect(result).to.equal('tenant-1');
+    expect(query.notCalled).to.equal(true);
+  });
+
   it('returns undefined when hostname lookup has no rows', async () => {
     const registry = new TenantContextRegistry(config, {}, process.cwd());
     registry.contexts.set('default', {
@@ -110,12 +122,61 @@ describe('TenantContextRegistry', () => {
     expect(() => registry.getContext('tenant-1')).to.throw();
   });
 
-  it('initializes default and tenant contexts from configured models', async () => {
+  it('initializes the default context and hostname cache without opening tenant contexts', async () => {
     const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'nmt-registry-'));
     createModelFile(
       cwd,
       'hostname.js',
       'module.exports = () => ({ name: "hostname", associate: (context) => { context.hostnameAssociated = true; } });',
+    );
+    createModelFile(
+      cwd,
+      'user.js',
+      'module.exports = () => ({ name: "user", associate: (context) => { context.userAssociated = true; } });',
+    );
+    const createSequelize = createSequelizeFactory(
+      [
+        { uuid: 'tenant-1', fqdn: 'tenant.example.com' },
+        { uuid: 'tenant-without-fqdn' },
+      ],
+    );
+    const db = {
+      sequelize: {
+        config: {
+          username: 'app',
+          password: 'secret',
+          host: 'localhost',
+          port: 5432,
+          database: 'defaultdb',
+        },
+        options: { dialect: 'postgres' },
+      },
+    };
+    const configLoader = {
+      requireFromProject: sinon.stub().returns(db),
+      getTenantModelFiles: sinon.stub().resolves(['user.js']),
+    };
+    const registry = new TenantContextRegistry(config, configLoader, cwd, createSequelize);
+
+    await registry.initialize();
+
+    expect(registry.resolveCachedHostname('tenant.example.com')).to.equal('tenant-1');
+    expect(registry.resolveCachedHostname('tenant-without-fqdn')).to.equal(undefined);
+    expect(registry.getContext('default').hostname.name).to.equal('hostname');
+    expect(registry.getContext('default').hostnameAssociated).to.equal(true);
+    expect(() => registry.getContext('tenant-1')).to.throw(
+      "Tenant database context 'tenant-1' has not been initialized",
+    );
+    expect(createSequelize.callCount).to.equal(1);
+    expect(configLoader.getTenantModelFiles.called).to.equal(false);
+  });
+
+  it('attaches tenant contexts lazily and reuses an existing tenant context', async () => {
+    const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'nmt-registry-'));
+    createModelFile(
+      cwd,
+      'hostname.js',
+      'module.exports = () => ({ name: "hostname" });',
     );
     createModelFile(
       cwd,
@@ -144,12 +205,12 @@ describe('TenantContextRegistry', () => {
     const registry = new TenantContextRegistry(config, configLoader, cwd, createSequelize);
 
     await registry.initialize();
+    await registry.attachTenantContext('tenant-1');
+    await registry.attachTenantContext('tenant-1');
 
-    expect(registry.resolveCachedHostname('tenant.example.com')).to.equal('tenant-1');
-    expect(registry.getContext('default').hostname.name).to.equal('hostname');
     expect(registry.getContext('tenant-1').user.name).to.equal('user');
-    expect(registry.getContext('default').hostnameAssociated).to.equal(true);
     expect(registry.getContext('tenant-1').userAssociated).to.equal(true);
-    expect(configLoader.getTenantModelFiles.called).to.equal(true);
+    expect(configLoader.getTenantModelFiles.calledOnce).to.equal(true);
+    expect(createSequelize.callCount).to.equal(2);
   });
 });

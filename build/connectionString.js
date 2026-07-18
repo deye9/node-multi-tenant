@@ -7,5 +7,9 @@ function buildConnectionString(sequelize, databaseName) {
     const dialect = connection.options.dialect;
     const database = databaseName || config.database;
     const password = config.password || "";
-    return `${dialect}://${config.username}:${password}@${config.host}:${config.port}/${database}`;
+    const username = encodeURIComponent(config.username || "");
+    const encodedPassword = encodeURIComponent(password);
+    const encodedDatabase = encodeURIComponent(database || "");
+    const port = config.port ? `:${config.port}` : "";
+    return `${dialect}://${username}:${encodedPassword}@${config.host}${port}/${encodedDatabase}`;
 }

@@ -72,6 +72,31 @@ describe('ConfigLoader', () => {
     expect(result['models-shared'].tenancy_hostname).to.equal('hostname.js');
   });
 
+  it('falls back to tenants/tenancy.js when no TypeScript config exists', () => {
+    delete process.env.NODE_ENV;
+    const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'nmt-config-js-'));
+    fs.mkdirSync(path.join(cwd, 'tenants'));
+    fs.writeFileSync(
+      path.join(cwd, 'tenants', 'tenancy.js'),
+      [
+        'module.exports = {',
+        '  datastore: {',
+        '    modelsfolder: "database/models",',
+        '    seedersfolder: "database/seeders",',
+        '    migrationsfolder: "database/migrations",',
+        '    dbconfigfile: "database/models/index",',
+        '  },',
+        '  "models-shared": { tenancy_hostname: "hostname.js" },',
+        '};',
+      ].join('\n'),
+    );
+
+    const result = new ConfigLoader(cwd).readConfig();
+
+    expect(result.datastore.modelsfolder).to.equal('database/models');
+    expect(result['models-shared'].tenancy_hostname).to.equal('hostname.js');
+  });
+
   it('excludes shared models and index.js from tenant model discovery', async () => {
     const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'nmt-models-'));
     const modelsPath = path.join(cwd, 'database', 'models');
