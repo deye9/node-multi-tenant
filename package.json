@@ -2,14 +2,23 @@
   "name": "node-multi-tenant",
   "version": "1.0.8",
   "description": "Multi-tenant Node.js Application",
-  "main": "main.js",
+  "main": "build/main.js",
+  "types": "build/main.d.ts",
+  "files": [
+    "build",
+    "dist",
+    "tenants",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "start": "node main.js",
-    "test-watch": "npm test -- --watch",
+    "build": "tsc -p tsconfig.json",
+    "prepare": "npm run build",
+    "start": "node build/main.js",
+    "test-watch": "npm run build && mocha \"tests/**/*.test.js\" --watch",
     "eslint": "eslint **/*.js --fix --quiet",
-    "coverage": "npm test && open coverage/index.html",
-    "test-integration": "nyc --reporter=html --reporter=text mocha ./tests/Integration --exit && open coverage/index.html",
-    "test": "npm run eslint && nyc --reporter=html --reporter=text mocha tests --recursive --exit && open coverage/index.html"
+    "coverage": "npm run build && nyc --reporter=html --reporter=text mocha \"tests/**/*.test.js\" --exit",
+    "test": "npm run build && nyc --reporter=text mocha \"tests/**/*.test.js\" --exit"
   },
   "repository": {
     "type": "git",
@@ -26,22 +35,25 @@
   },
   "homepage": "https://github.com/deye9/node-multi-tenant#readme",
   "dependencies": {
-    "auto-bind": "^2.1.0",
-    "dotenv": "^6.2.0",
-    "pg": "^7.10.0",
-    "sequelize": "^5.8.2",
-    "sequelize-cli": "^5.4.0"
+    "auto-bind": "^5.0.1",
+    "dotenv": "^17.4.2",
+    "pg": "^8.22.0",
+    "sequelize": "^6.37.8",
+    "sequelize-cli": "^6.6.5"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
-    "chai-as-promised": "^7.1.1",
-    "chai-http": "^4.3.0",
-    "eslint": "^5.16.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.17.2",
-    "mocha": "^5.2.0",
-    "nyc": "^13.1.0",
-    "sinon": "^7.3.2",
-    "standard": "^12.0.1"
+    "@types/node": "^26.1.1",
+    "chai": "^6.2.2",
+    "chai-as-promised": "^8.0.2",
+    "chai-http": "^5.1.2",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.32.0",
+    "jest": "^30.4.2",
+    "mocha": "^11.7.6",
+    "nyc": "^18.0.0",
+    "sinon": "^22.0.0",
+    "standard": "^17.1.2",
+    "typescript": "^6.0.3"
   }
 }

@@ -63,5 +63,3 @@ typings/
 # ignore commands file
 commands.txt
 *.npmignore
-
-tests

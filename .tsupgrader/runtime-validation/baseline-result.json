@@ -1,0 +1,59 @@
+{
+  "planHash": "1f75cb3e30f85f70aed6fd081b6355b72f66bca8ed645a1cda29e11e6dd2591a",
+  "phase": "baseline",
+  "recordedAtUtc": "2026-07-18T11:18:50.3149610Z",
+  "retryCount": 0,
+  "resetBaseline": false,
+  "result": {
+    "setupSucceeded": true,
+    "setupDurationMs": 3948,
+    "setupFailureOutput": null,
+    "assertions": [
+      {
+        "name": "tsc-no-emit",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "",
+        "durationMs": 1275
+      },
+      {
+        "name": "tests-pass",
+        "kind": "process",
+        "verificationMethod": "test-results",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\n\u003E node-multi-tenant@1.0.8 test\n\u003E npm run build \u0026\u0026 nyc --reporter=text mocha \u0022tests/**/*.test.js\u0022 --exit\n\n\n\u003E node-multi-tenant@1.0.8 build\n\u003E tsc -p tsconfig.json\n\n\n\n  TenancyCli\n    \u2713 dispatches seed and migration commands without touching the database directly\n\n  ConfigLoader\n    \u2713 returns an explicit config without reading from disk\n    \u2713 uses the built-in test config when NODE_ENV is test\n    \u2713 loads tenants/tenancy.ts as the default project config\n    \u2713 excludes shared models and index.js from tenant model discovery\n\n  buildConnectionString\n    \u2713 builds a Sequelize URL from the current database config\n    \u2713 can override the database name for tenant-specific connections\n\n  TenantContextRegistry\n    \u2713 remembers, resolves, and forgets hostnames case-insensitively\n    \u2713 throws when a tenant context has not been initialized\n    \u2713 resolves uncached hostnames through the default database and caches them\n    \u2713 returns undefined when hostname lookup has no rows\n    \u2713 closes and removes existing contexts and ignores missing contexts\n    \u2713 initializes default and tenant contexts from configured models\n\n  public package exports\n    \u2713 exposes the package facade from build/main.js\n    \u2713 keeps delete as the CommonJS alias for deleteRecord\n    \u2713 delegates public facade calls to a configured TenantService instance\n\n  TenantRepository\n    \u2713 creates a single entity through the active tenant model\n    \u2713 uses bulkCreate when adding an array of entities\n    \u2713 finds records with and without filters\n    \u2713 wraps model failures in RepositoryError\n    \u2713 writes audit records for tenant mutations when enabled\n    \u2713 does not audit mutations on the default tenant\n    \u2713 removes records and audits the previous value\n    \u2713 truncates records and writes one audit row per removed record\n    \u2713 updates records and returns the model update result\n    \u2713 finds by primary key and unwraps dataValues\n    \u2713 finds one record and unwraps dataValues\n    \u2713 executes raw SQL against the active tenant context\n\n  TenantService\n    \u2713 initializes once and wires requestUrl events to tenant resolution\n    \u2713 honors the configured default hostname and cached tenant hostnames\n    \u2713 creates a tenant, provisions its database, and caches the hostname\n    \u2713 deletes a tenant and restores default tenant context\n    \u2713 updates tenant fields without changing protected identity fields\n    \u2713 delegates data operations to the repository after initialization\n    \u2713 starts the interactive CLI when requested\n\n\n  40 passing (439ms)\n\n---------------------|----------|----------|----------|----------|-------------------|\nFile                 |  % Stmts | % Branch |  % Funcs |  % Lines | Uncovered Line #s |\n---------------------|----------|----------|----------|----------|-------------------|\nAll files            |    95.85 |     90.3 |    91.26 |    96.88 |                   |\n cli.js              |    91.25 |    93.33 |    81.82 |    91.14 |... 62,63,64,65,78 |\n config.js           |    93.33 |    83.33 |     87.5 |     93.1 |             34,41 |\n connectionString.js |      100 |      100 |      100 |      100 |                   |\n contextRegistry.js  |    96.55 |    85.19 |    93.75 |    96.55 |             12,60 |\n errors.js           |      100 |       75 |      100 |      100 |                13 |\n main.js             |    94.92 |      100 |    83.33 |      100 |                   |\n repository.js       |      100 |    96.43 |      100 |      100 |                94 |\n tenantService.js    |    97.17 |    88.57 |    91.67 |    99.04 |                39 |\n---------------------|----------|----------|----------|----------|-------------------|\n",
+        "durationMs": 2840,
+        "testResults": {
+          "testFramework": "jest",
+          "runnerDetectedFrom": "package_json",
+          "testsTotal": 0,
+          "testsPassed": 0,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "parseFailed": true
+        }
+      },
+      {
+        "name": "build-emits-main",
+        "kind": "process",
+        "verificationMethod": "output-contains",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "BUILD_OK\n",
+        "durationMs": 62
+      }
+    ]
+  }
+}

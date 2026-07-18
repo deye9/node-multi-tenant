@@ -1,0 +1,43 @@
+{
+  "generatedAt": "2026-07-18T00:00:00Z",
+  "generatedOnPlatform": "darwin",
+  "projectType": "library",
+  "setup": [
+    {
+      "command": "npm",
+      "args": ["install"]
+    }
+  ],
+  "assertions": [
+    {
+      "name": "tsc-no-emit",
+      "kind": "process",
+      "command": "npx",
+      "args": ["tsc", "--noEmit"],
+      "verificationMethod": "exit-code",
+      "expected": "0",
+      "timeoutSeconds": 180
+    },
+    {
+      "name": "tests-pass",
+      "kind": "process",
+      "command": "npm",
+      "args": ["test"],
+      "verificationMethod": "test-results",
+      "expected": "0",
+      "timeoutSeconds": 300
+    },
+    {
+      "name": "build-emits-main",
+      "kind": "process",
+      "command": "node",
+      "args": [
+        "-e",
+        "require('fs').accessSync(require('./package.json').main); console.log('BUILD_OK')"
+      ],
+      "verificationMethod": "output-contains",
+      "expected": "BUILD_OK",
+      "timeoutSeconds": 30
+    }
+  ]
+}
